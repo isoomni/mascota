@@ -1,0 +1,6 @@
+.idea/*
+.gradle/*
+build/*
+gradle/*
+logs/*
+src/main/java/com/example/demo/config/*
