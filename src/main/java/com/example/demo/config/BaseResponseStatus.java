@@ -24,11 +24,18 @@ public enum BaseResponseStatus {
 
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
+    LISTS_EMPTY_USER_ID(false, 2011, "목차 아이디 값을 확인해주세요."),
 
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
+    POST_DIARYS_EXISTS_TITLE(false,2018,"제목을 입력해주세요."),
+    POST_DIARYS_EXISTS_CONTEXT(false,2019,"내용을 입력해주세요."),
+    POST_DIARYS_EXISTS_DATE(false,2020,"날짜를 입력해주세요."),
+    POST_DIARYS_EXISTS_IMG(false,2021,"이미지를 입력해주세요."),
+    POST_DIARYS_EXISTS_MOOD(false,2022,"기분을 입력해주세요."),
+    POST_DIARYS_EXISTS_ELEMENT(false,2023,"기분을 선택해주세요."),
 
 
 

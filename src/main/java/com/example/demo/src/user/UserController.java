@@ -45,7 +45,7 @@ public class UserController {
      */
     //Query String
     @ResponseBody
-    @GetMapping("") // (GET) 127.0.0.1:9000/users/chk
+    @GetMapping("") // (GET) 127.0.0.1:9000/users
     public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String Email) {
         System.out.println(Email);
         try{
