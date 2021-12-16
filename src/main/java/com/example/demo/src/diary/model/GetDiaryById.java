@@ -11,6 +11,6 @@ import java.util.*;
 public class GetDiaryById {
     private GetDiaryDetail getDiaryDetail;
     private ArrayList<String> imgUrls;
-    private HashSet<Mood> moods;
+    private ArrayList<Mood> moods;
 }
 

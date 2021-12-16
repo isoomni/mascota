@@ -57,13 +57,13 @@ public class DiaryDao {
         int idx = diaryIdx;
         String Query = "select diary.idx, title, context, diary.type, diary.date, diaryImg.imgUrl, mood.petIdx, pet.name, mood.type as petType\n" +
                 "from diary \n" +
-                "join diaryImg on diaryImg.diaryIdx = diary.idx\n" +
-                "join mood on mood.diaryIdx = diary.idx\n" +
+                "join diaryImg on diaryImg.diaryIdx = diary.idx and diaryImg.status = 'N'\n" +
+                "join mood on mood.diaryIdx = diary.idx and mood.status = 'N'\n" +
                 "join pet on mood.petIdx = pet.idx\n" +
-                "where diary.idx = ?";
+                "where diary.idx = ? and diary.status = 'N' order by mood.petIdx";
 
         ArrayList<String> imgs = new ArrayList<String>();
-        HashSet<Mood> moods = new HashSet<Mood>();
+        ArrayList<Mood> moods = new ArrayList<Mood>();
 
         List<GetDiaryDetail> ans = this.jdbcTemplate.query(Query,
                 new RowMapper<GetDiaryDetail>() {
@@ -75,7 +75,10 @@ public class DiaryDao {
                             imgs.add(chk);
                         }
                         Mood mood = new Mood(rs.getInt("petIdx"), rs.getString("name"), rs.getString("petType"));
-                        moods.add(mood);
+                        System.out.println(rs.getInt("petIdx")+" "+rs.getString("name")+" "+rs.getString("petType"));
+                        if (!moods.contains(mood)){
+                            moods.add(mood);
+                        }
 
                         return result;
                     }
@@ -128,5 +131,155 @@ public class DiaryDao {
                         rs.getString("type"),
                         rs.getString("date")),
                 lastInsertId);
+    }
+
+    public int updateDiary(GetDiaryById getDiaryById){
+        GetDiaryDetail input = getDiaryById.getGetDiaryDetail();
+        int idx = input.getIdx();
+        Object[] Params = new Object[]{input.getTitle(), input.getContext(), input.getType(), input.getDate(),input.getIdx()};
+        String Query = "update diary set title = ?, context = ?, type = ?, date = ? where idx = ?";
+        if (!getDiaryById.getImgUrls().isEmpty()){
+            String imgQuery = "select idx from diaryImg where diaryIdx = ?";
+            ArrayList<String> imgurls = getDiaryById.getImgUrls();
+            List<String> imgs = this.jdbcTemplate.query(imgQuery,(rs,rowNum)->rs.getString("idx"),idx);
+            if (imgs.size() <= imgurls.size()){
+                String query = "update diaryImg set imgUrl = ?, status = 'N' where idx = ?";
+                for (int i = 0; i < imgs.size(); i++){
+                    Object[] Param = new Object[]{imgurls.get(i),imgs.get(i)};
+                    this.jdbcTemplate.update(query,Param);
+                }
+                query = "insert into diaryImg(imgUrl,diaryIdx) values (?,?);";
+                for (int i = imgs.size(); i < imgurls.size(); i++){
+                    Object[] Param = new Object[]{imgurls.get(i),idx};
+                    this.jdbcTemplate.update(query,Param);
+                }
+            }
+            else{
+                String query = "update diaryImg set imgUrl = ?, status = 'N' where idx = ?";
+                for (int i = 0; i < imgurls.size(); i++){
+                    Object[] Param = new Object[]{imgurls.get(i),imgs.get(i)};
+                    this.jdbcTemplate.update(query,Param);
+                }
+                query = "update diaryImg set status = 'D' where idx = ?";
+                for (int i = imgurls.size(); i < imgs.size(); i++){
+                    this.jdbcTemplate.update(query,imgs.get(i));
+                }
+            }
+        }
+
+        if (!getDiaryById.getMoods().isEmpty()){
+            String moodQuery = "select idx from mood where diaryIdx = ?";
+            ArrayList<Mood> moods = getDiaryById.getMoods();
+            List<String> moodidx = this.jdbcTemplate.query(moodQuery,(rs,rowNum)->rs.getString("idx"),idx);
+            if (moodidx.size() <= moods.size()){
+                String mquery = "update mood set petIdx = ?, type = ?, status = 'N' where idx = ?";
+                for (int i = 0; i < moodidx.size(); i++){
+                    Mood tmp = moods.get(i);
+                    Object[] Parameter = new Object[]{tmp.getPetIdx(), tmp.getPetType(),moodidx.get(i)};
+                    this.jdbcTemplate.update(mquery,Parameter);
+                }
+                mquery = "insert into mood(petIdx,type,diaryIdx) values (?,?,?);";
+                for (int i = moodidx.size(); i < moods.size(); i++){
+                    Mood tmp = moods.get(i);
+                    Object[] Parameter = new Object[]{tmp.getPetIdx(), tmp.getPetType(),idx};
+                    this.jdbcTemplate.update(mquery,Parameter);
+                }
+            }
+            else{
+                String mquery = "update mood set petIdx = ?, type = ?, status = 'N' where idx = ?";
+                for (int i = 0; i < moods.size(); i++){
+                    Mood tmp = moods.get(i);
+                    Object[] Parameter = new Object[]{tmp.getPetIdx(),tmp.getPetType(),moodidx.get(i)};
+                    this.jdbcTemplate.update(mquery,Parameter);
+                }
+                mquery = "update mood set status = 'D' where idx = ?";
+                for (int i = moods.size(); i < moodidx.size(); i++){
+                    this.jdbcTemplate.update(mquery,moodidx.get(i));
+                }
+            }
+        }
+
+
+        return this.jdbcTemplate.update(Query, Params);
+    }
+
+    public GetDiaryDetail chkDiary(int idx){
+        String query = "select idx, title, context, type, date from diary where idx = ? and status = 'N'";
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum) -> new GetDiaryDetail(
+                        rs.getInt("idx"),
+                        rs.getString("title"),
+                        rs.getString("context"),
+                        rs.getString("type"),
+                        rs.getString("date"))
+                ,idx);
+    }
+
+    public int deleteDiary(int idx){
+        String query = "update diary set status = 'D' where idx = ?";
+        return this.jdbcTemplate.update(query,idx);
+    }
+
+    public int insertLists(int userIdx,String context,List<Lists> chk){
+        String query = "insert into diaryList(userIdx,context,num) values (?,?,?)";
+        Object[] param = new Object[]{userIdx,context,chk.size()};
+        String updateQuery = "update diaryList set context = ?, num = ?, status = 'N' where idx = ?";
+        boolean flag = false;
+        for (int i = 0; i < chk.size(); i++){
+            Lists tmp = chk.get(i);
+            if (tmp.getStatus().equals("D")){
+                Object[] pa = new Object[]{context,i,tmp.getListIdx()};
+                return this.jdbcTemplate.update(updateQuery,pa);
+            }
+        }
+
+        return this.jdbcTemplate.update(query,param);
+    }
+
+    public int updateLists(int userIdx, List<String> lists,List<Lists> chk){
+        if (lists.size() <= chk.size()){ // 삭제
+            String query = "update diaryList set context = ?, num = ?, status = 'N' where idx = ?";
+            for (int i = 0; i < lists.size(); i++){
+                Lists tmp = chk.get(i);
+                Object[] param = new Object[]{lists.get(i),i,tmp.getListIdx()};
+                this.jdbcTemplate.update(query,param);
+            }
+            query = "update diaryList set status = 'D' where idx = ?";
+            for (int i = lists.size(); i < chk.size(); i++){
+                Lists tmp = chk.get(i);
+                this.jdbcTemplate.update(query,tmp.getListIdx());
+            }
+            return 1;
+        }
+        else { // 추가
+            String query = "update diaryList set context = ?, num = ?, status = 'N' where idx = ?";
+            String addquery = "insert into diaryList(userIdx,context,num) values ";
+            int len = addquery.length();
+            for (int i = 0; i < lists.size(); i++){
+                if (i >= chk.size()){
+                    addquery += "(" + userIdx + ",'" + lists.get(i) + "'," + i + "),";
+                    continue;
+                }
+                Lists tmp = chk.get(i);
+                Object[] param = new Object[]{lists.get(i),i,tmp.getListIdx()};
+                this.jdbcTemplate.update(query,param);
+            }
+            if (len < addquery.length()){
+                addquery = addquery.substring(0,addquery.length()-1);
+                System.out.println(addquery);
+                return this.jdbcTemplate.update(addquery);
+            }
+            else{
+                return 1;
+            }
+        }
+    }
+
+    public List<Lists> getlists(int userIdx){
+        int idx = userIdx;
+        String Query = "select idx, context, status from diaryList where userIdx = ? order by idx";
+
+        return this.jdbcTemplate.query(Query,
+                (rs,rowNum) ->  new Lists(rs.getInt("idx"), rs.getString("context"),rs.getString("status")),idx);
     }
 }

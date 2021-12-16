@@ -10,4 +10,11 @@ import lombok.Setter;
 public class Lists {
     private int listIdx;
     private String context;
+    private String status;
+
+    public Lists(int listIdx, String context){
+        this.listIdx = listIdx;
+        this.context = context;
+        this.status = null;
+    }
 }

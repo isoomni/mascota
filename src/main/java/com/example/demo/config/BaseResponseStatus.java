@@ -36,7 +36,11 @@ public enum BaseResponseStatus {
     POST_DIARYS_EXISTS_IMG(false,2021,"이미지를 입력해주세요."),
     POST_DIARYS_EXISTS_MOOD(false,2022,"기분을 입력해주세요."),
     POST_DIARYS_EXISTS_ELEMENT(false,2023,"기분을 선택해주세요."),
-
+    POST_DIARYS_EXCEED_IMG(false,2024,"이미지는 최대 3개 입니다."),
+    POST_DIARYS_NONE(false,2025,"해당 다이어리는 존재하지 않습니다."),
+    FAIL_DIARYS_MODIFY(false,2026,"해당 다이어리를 변경하는데 실패했습니다."),
+    FAIL_LISTS_ADD(false,2027,"목차를 변경하는데 실패했습니다."),
+    ADD_LISTS_TEXT_EMPTY(false,2028,"목차내용을 입력해주세요."),
 
 
     /**

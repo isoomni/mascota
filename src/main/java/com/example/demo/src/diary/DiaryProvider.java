@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.*;
 
@@ -40,11 +41,15 @@ public class DiaryProvider {
 
     public GetDiaryById getDiaryDetailById(int diaryIdx) throws BaseException{
         try{
+            GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
+
             GetDiaryById getDiarysRes = diaryDao.getDiaryDetail(diaryIdx);
             return getDiarysRes;
         }
         catch (Exception exception) {
-            System.out.println(exception);
+            if (exception instanceof EmptyResultDataAccessException){
+                throw new BaseException(POST_DIARYS_NONE);
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }

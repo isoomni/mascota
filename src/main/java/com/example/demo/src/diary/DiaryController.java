@@ -72,8 +72,7 @@ public class DiaryController {
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<GetDiaryDetail> createUser(@RequestBody PostDiaryReq postDiaryReq) {
-        // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
+    public BaseResponse<GetDiaryDetail> createDiary(@RequestBody PostDiaryReq postDiaryReq) {
         if(postDiaryReq.getTitle() == null){
             return new BaseResponse<>(POST_DIARYS_EXISTS_TITLE);
         }
@@ -90,9 +89,14 @@ public class DiaryController {
             return new BaseResponse<>(POST_DIARYS_EXISTS_IMG);
         }
 
+        if (postDiaryReq.getImgUrls().size() > 3){
+            return new BaseResponse<>(POST_DIARYS_EXCEED_IMG);
+        }
+
         if(postDiaryReq.getMoods() == null || postDiaryReq.getMoods().isEmpty()){
             return new BaseResponse<>(POST_DIARYS_EXISTS_MOOD);
         }
+
 
         for (Mood mood : postDiaryReq.getMoods()){
             if (mood.getPetIdx() == 0 || mood.getPetType() == null){
@@ -103,6 +107,64 @@ public class DiaryController {
         try{
             GetDiaryDetail last_insert = diaryService.createDiary(postDiaryReq);
             return new BaseResponse<>(last_insert);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("")
+    public BaseResponse<String> updateDiary(@RequestBody GetDiaryById getDiaryById) {
+        System.out.println(getDiaryById.getGetDiaryDetail());
+        if (getDiaryById.getImgUrls().size() > 3){
+            return new BaseResponse<>(POST_DIARYS_EXCEED_IMG);
+        }
+
+        for (Mood mood : getDiaryById.getMoods()){
+            if (mood.getPetIdx() == 0 || mood.getPetType() == null){
+                return new BaseResponse<>(POST_DIARYS_EXISTS_ELEMENT);
+            }
+        }
+
+        try{
+            diaryService.updateDiary(getDiaryById);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/{diaryIdx}")
+    public BaseResponse<String> deleteDiary(@PathVariable int diaryIdx) {
+        try{
+            diaryService.deleteDiary(diaryIdx);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/lists")
+    public BaseResponse<String> insertLists(@RequestBody ListReq lists) {
+        try{
+            if (lists.getContext() == null){
+                return new BaseResponse<>(ADD_LISTS_TEXT_EMPTY);
+            }
+            diaryService.insertLists(lists.getUserIdx(),lists.getContext());
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/lists")
+    public BaseResponse<String> updateLists(@RequestBody ListReq lists) {
+        try{
+            diaryService.updateLists(lists.getUserIdx(),lists.getLists());
+            return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
