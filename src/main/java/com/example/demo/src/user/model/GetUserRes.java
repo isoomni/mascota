@@ -11,7 +11,9 @@ import lombok.Setter;
 public class GetUserRes {
     private int idx;
     private String id;
-    private String password;
     private String nickname;
+    private int level;
+    private String imgUrl;
     private String authorName;
+    private String prologTitle;
 }

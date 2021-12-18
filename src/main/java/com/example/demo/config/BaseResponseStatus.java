@@ -29,7 +29,7 @@ public enum BaseResponseStatus {
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
+    POST_USERS_EXISTS_ID(false,2017,"중복된 ID입니다."),
     POST_DIARYS_EXISTS_TITLE(false,2018,"제목을 입력해주세요."),
     POST_DIARYS_EXISTS_CONTEXT(false,2019,"내용을 입력해주세요."),
     POST_DIARYS_EXISTS_DATE(false,2020,"날짜를 입력해주세요."),
@@ -41,6 +41,11 @@ public enum BaseResponseStatus {
     FAIL_DIARYS_MODIFY(false,2026,"해당 다이어리를 변경하는데 실패했습니다."),
     FAIL_LISTS_ADD(false,2027,"목차를 변경하는데 실패했습니다."),
     ADD_LISTS_TEXT_EMPTY(false,2028,"목차내용을 입력해주세요."),
+    NONE_USER_EXIST(false,2029,"존재하지 않는 ID입니다."),
+    NONE_ID_EXIST(false,2030,"ID를 입력해주세요."),
+    NONE_PASSWORD_EXIST(false,2031,"패스워드를 입력해주세요."),
+    NONE_NICKNAME_EXIST(false,2032,"작가명을 입력해주세요."),
+    CHANGE_NICKNAME_EXIST(false,2033,"변경할 작가명을 입력해주세요."),
 
 
     /**
@@ -51,7 +56,7 @@ public enum BaseResponseStatus {
 
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
-    FAILED_TO_LOGIN(false,3014,"없는 아이디거나 비밀번호가 틀렸습니다."),
+    FAILED_TO_LOGIN(false,3014,"비밀번호가 틀렸습니다."),
 
 
 
