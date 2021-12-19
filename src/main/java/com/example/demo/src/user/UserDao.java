@@ -49,7 +49,6 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(Query,
                 int.class,
                 id);
-
     }
 
     public int modifyUserName(PatchUserReq patchUserReq){

@@ -63,4 +63,20 @@ public class DiaryProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public int checkUser(int userIdx) throws BaseException{
+        try{
+            return diaryDao.checkUser(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int checkList(int userIdx, int listIdx) throws BaseException{
+        try{
+            return diaryDao.checkList(userIdx, listIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

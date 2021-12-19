@@ -41,11 +41,14 @@ public enum BaseResponseStatus {
     FAIL_DIARYS_MODIFY(false,2026,"해당 다이어리를 변경하는데 실패했습니다."),
     FAIL_LISTS_ADD(false,2027,"목차를 변경하는데 실패했습니다."),
     ADD_LISTS_TEXT_EMPTY(false,2028,"목차내용을 입력해주세요."),
-    NONE_USER_EXIST(false,2029,"존재하지 않는 ID입니다."),
+    NONE_USER_EXIST(false,2029,"존재하지 않는 사용자입니다."),
     NONE_ID_EXIST(false,2030,"ID를 입력해주세요."),
     NONE_PASSWORD_EXIST(false,2031,"패스워드를 입력해주세요."),
     NONE_NICKNAME_EXIST(false,2032,"작가명을 입력해주세요."),
     CHANGE_NICKNAME_EXIST(false,2033,"변경할 작가명을 입력해주세요."),
+    NONE_USER_HAVE(false,2034,"해당 목차의 작가가 아닙니다."),
+    NONE_DIARY_EXIST(false,2035,"이미 삭제된 일기입니다."),
+    FAIL_LISTS_DEL(false,2036,"목차를 삭제하는데 실패했습니다."),
 
 
     /**

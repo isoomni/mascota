@@ -9,7 +9,6 @@ import java.util.*;
 @Setter
 @AllArgsConstructor
 public class ListReq {
-    private int userIdx;
     private String context;
     private List<String> lists;
 }

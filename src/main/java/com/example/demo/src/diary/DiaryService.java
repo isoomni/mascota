@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;
 
@@ -68,9 +69,6 @@ public class DiaryService {
     public void deleteDiary(int diaryIdx) throws BaseException {
         try{
             GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
-            if (chk == null){
-                throw new BaseException(POST_DIARYS_NONE);
-            }
 
             int result = diaryDao.deleteDiary(diaryIdx);
             if (result == 0){
@@ -78,6 +76,9 @@ public class DiaryService {
             }
 
         } catch (Exception exception) {
+            if (exception instanceof EmptyResultDataAccessException){
+                throw new BaseException(NONE_DIARY_EXIST);
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -108,5 +109,15 @@ public class DiaryService {
         }
     }
 
+    public void deleteLists(int listIdx) throws BaseException {
+        try{
+            int result = diaryDao.deleteLists(listIdx);
+            if (result == 0){
+                throw new BaseException(FAIL_LISTS_DEL);
+            }
 
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

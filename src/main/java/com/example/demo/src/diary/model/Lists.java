@@ -15,6 +15,6 @@ public class Lists {
     public Lists(int listIdx, String context){
         this.listIdx = listIdx;
         this.context = context;
-        this.status = null;
+        this.status = "N";
     }
 }

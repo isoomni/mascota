@@ -23,6 +23,21 @@ public class DiaryDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public int checkUser(int idx){
+        String Query = "select exists(select nickname from user where idx = ? and status = 'N')";
+        return this.jdbcTemplate.queryForObject(Query,
+                int.class,
+                idx);
+    }
+
+    public int checkList(int userIdx, int listIdx){
+        String Query = "select exists(select context from diaryList where userIdx = ? and idx = ? and status = 'N')";
+        Object[] param = new Object[]{userIdx, listIdx};
+        return this.jdbcTemplate.queryForObject(Query,
+                int.class,
+                param);
+    }
+
     public List<GetDiaryRes> getDiarylist(int listIdx){
         int idx = listIdx;
         String Query = "select diary.idx, diaryList.context as list, diary.title,diary.context, diary.type,diary.date,\n" +
@@ -36,10 +51,10 @@ public class DiaryDao {
                 "when '7' then '토요일'\n" +
                 "end as day, diaryImg.imgUrl from diary\n" +
                 "join diaryList on diaryList.idx = diary.listIdx\n" +
-                "join diaryImg on diaryImg.diaryIdx = diary.idx \n" +
+                "join diaryImg on diaryImg.diaryIdx = diary.idx and diaryImg.status = 'N'\n" +
                 "where listIdx = ? and diary.status = 'N'\n" +
                 "group by diary.idx\n" +
-                "order by diary.createdAt desc;";
+                "order by diary.date desc diary.idx;";
         return this.jdbcTemplate.query(Query,
                 (rs,rowNum) -> new GetDiaryRes(
                         rs.getInt("idx"),
@@ -75,7 +90,6 @@ public class DiaryDao {
                             imgs.add(chk);
                         }
                         Mood mood = new Mood(rs.getInt("petIdx"), rs.getString("name"), rs.getString("petType"));
-                        System.out.println(rs.getInt("petIdx")+" "+rs.getString("name")+" "+rs.getString("petType"));
                         if (!moods.contains(mood)){
                             moods.add(mood);
                         }
@@ -266,7 +280,6 @@ public class DiaryDao {
             }
             if (len < addquery.length()){
                 addquery = addquery.substring(0,addquery.length()-1);
-                System.out.println(addquery);
                 return this.jdbcTemplate.update(addquery);
             }
             else{
@@ -282,4 +295,10 @@ public class DiaryDao {
         return this.jdbcTemplate.query(Query,
                 (rs,rowNum) ->  new Lists(rs.getInt("idx"), rs.getString("context"),rs.getString("status")),idx);
     }
+
+    public int deleteLists(int idx){
+        String query = "update diaryList set status = 'D' where idx = ?";
+        return this.jdbcTemplate.update(query,idx);
+    }
+
 }

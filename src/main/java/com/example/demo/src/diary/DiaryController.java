@@ -34,12 +34,19 @@ public class DiaryController {
     }
 
     @ResponseBody
-    @GetMapping("")
-    public BaseResponse<List<GetDiaryRes>> getUsers(@RequestParam(required = false) Integer listIdx) {
+    @GetMapping("/lists/{listIdx}")
+    public BaseResponse<List<GetDiaryRes>> getDiaryLists(@PathVariable int listIdx) {
         try{
-            if (listIdx == null){
-                return new BaseResponse<>(LISTS_EMPTY_USER_ID);
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
             }
+
+            if (diaryProvider.checkList(idx,listIdx) == 0){
+                return new BaseResponse<>(NONE_USER_HAVE);
+            }
+
             List<GetDiaryRes> getDiarysRes = diaryProvider.getDiaryById(listIdx);
             return new BaseResponse<>(getDiarysRes);
         } catch(BaseException exception){
@@ -51,6 +58,11 @@ public class DiaryController {
     @GetMapping("/{diaryIdx}")
     public BaseResponse<GetDiaryById> getUsers(@PathVariable int diaryIdx) {
         try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
             GetDiaryById getDiarysRes = diaryProvider.getDiaryDetailById(diaryIdx);
             return new BaseResponse<>(getDiarysRes);
         } catch(BaseException exception){
@@ -59,11 +71,15 @@ public class DiaryController {
     }
 
     @ResponseBody
-    @GetMapping("/lists/{userIdx}")
-    public BaseResponse<List<Lists>> getLists(@PathVariable int userIdx) {
-        System.out.println(userIdx);
+    @GetMapping("/lists")
+    public BaseResponse<List<Lists>> getLists() {
         try{
-            List<Lists> Result = diaryProvider.getDiarylists(userIdx);
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+            List<Lists> Result = diaryProvider.getDiarylists(idx);
             return new BaseResponse<>(Result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -105,6 +121,12 @@ public class DiaryController {
         }
 
         try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+            postDiaryReq.setUserIdx(idx);
             GetDiaryDetail last_insert = diaryService.createDiary(postDiaryReq);
             return new BaseResponse<>(last_insert);
         } catch(BaseException exception){
@@ -115,7 +137,6 @@ public class DiaryController {
     @ResponseBody
     @PatchMapping("")
     public BaseResponse<String> updateDiary(@RequestBody GetDiaryById getDiaryById) {
-        System.out.println(getDiaryById.getGetDiaryDetail());
         if (getDiaryById.getImgUrls().size() > 3){
             return new BaseResponse<>(POST_DIARYS_EXCEED_IMG);
         }
@@ -127,6 +148,12 @@ public class DiaryController {
         }
 
         try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
             diaryService.updateDiary(getDiaryById);
             return new BaseResponse<>("");
         } catch(BaseException exception){
@@ -138,6 +165,11 @@ public class DiaryController {
     @PatchMapping("/{diaryIdx}")
     public BaseResponse<String> deleteDiary(@PathVariable int diaryIdx) {
         try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
             diaryService.deleteDiary(diaryIdx);
             return new BaseResponse<>("");
         } catch(BaseException exception){
@@ -149,10 +181,15 @@ public class DiaryController {
     @PostMapping("/lists")
     public BaseResponse<String> insertLists(@RequestBody ListReq lists) {
         try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
             if (lists.getContext() == null){
                 return new BaseResponse<>(ADD_LISTS_TEXT_EMPTY);
             }
-            diaryService.insertLists(lists.getUserIdx(),lists.getContext());
+            diaryService.insertLists(idx,lists.getContext());
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -163,7 +200,28 @@ public class DiaryController {
     @PatchMapping("/lists")
     public BaseResponse<String> updateLists(@RequestBody ListReq lists) {
         try{
-            diaryService.updateLists(lists.getUserIdx(),lists.getLists());
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+            diaryService.updateLists(idx,lists.getLists());
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/lists/{listIdx}")
+    public BaseResponse<String> updateLists(@PathVariable int listIdx) {
+        try{
+            int idx = jwtService.getUserIdx();
+
+            if (diaryProvider.checkUser(idx) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+            diaryService.deleteLists(listIdx);
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
