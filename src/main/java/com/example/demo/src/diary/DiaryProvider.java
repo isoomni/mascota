@@ -41,10 +41,21 @@ public class DiaryProvider {
 
     public GetDiaryById getDiaryDetailById(int diaryIdx) throws BaseException{
         try{
-            GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
-
             GetDiaryById getDiarysRes = diaryDao.getDiaryDetail(diaryIdx);
             return getDiarysRes;
+        }
+        catch (Exception exception) {
+            if (exception instanceof EmptyResultDataAccessException){
+                throw new BaseException(POST_DIARYS_NONE);
+            }
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public GetDiaryDetail checkDiary(int diaryIdx) throws BaseException{
+        try{
+            GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
+            return chk;
         }
         catch (Exception exception) {
             if (exception instanceof EmptyResultDataAccessException){
@@ -75,6 +86,14 @@ public class DiaryProvider {
     public int checkList(int userIdx, int listIdx) throws BaseException{
         try{
             return diaryDao.checkList(userIdx, listIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public GetDiaryRes getLastDiary(int userIdx) throws BaseException{
+        try{
+            return diaryDao.getLastDiary(userIdx);
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }

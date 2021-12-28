@@ -52,6 +52,22 @@ public class UserProvider {
         }
     }
 
+    public int checkUser(int idx) throws BaseException{
+        try{
+            return userDao.checkUser(idx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int checkPet(int idx) throws BaseException{
+        try{
+            return userDao.checkPet(idx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException{
         User user = userDao.getPwd(postLoginReq);
         String password;
@@ -69,7 +85,24 @@ public class UserProvider {
         else{
             throw new BaseException(FAILED_TO_LOGIN);
         }
-
     }
+
+    public List<Pet> getPetbyId(int userIdx) throws BaseException{
+        try{
+            return userDao.getPetList(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public Book selectBook(int userIdx) throws BaseException{
+        try{
+            return userDao.getBook(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 
 }

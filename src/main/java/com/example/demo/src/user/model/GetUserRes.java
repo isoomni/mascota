@@ -14,6 +14,5 @@ public class GetUserRes {
     private String nickname;
     private int level;
     private String imgUrl;
-    private String authorName;
-    private String prologTitle;
+    private String title;
 }

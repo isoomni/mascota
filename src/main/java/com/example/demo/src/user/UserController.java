@@ -9,11 +9,11 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.utils.ValidationRegex.isRegexEmail;
+import static com.example.demo.utils.ValidationRegex.isRegexDate;
 
 @RestController
 @RequestMapping("/users")
@@ -34,9 +34,8 @@ public class UserController {
     }
 
     @ResponseBody
-    @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/users/:userIdx
+    @GetMapping("/{userIdx}") 
     public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
-        // Get Users
         try{
             GetUserRes getUserRes = userProvider.getUser(userIdx);
             return new BaseResponse<>(getUserRes);
@@ -48,17 +47,18 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostLoginRes> createUser(@RequestBody PostUserReq postUserReq) {
+    public BaseResponse<PostLoginRes> createUser(@RequestBody PostLoginReq postUserReq) {
         try{
             if (postUserReq.getId() == null){
                 return new BaseResponse<>(NONE_ID_EXIST);
             }
-            if (postUserReq.getPassword() == null){
-                return new BaseResponse<>(NONE_PASSWORD_EXIST);
+
+            if (userProvider.checkId(postUserReq.getId()) == 1){
+                return new BaseResponse<>(ALREADY_USER_EXIST);
             }
 
-            if (postUserReq.getNickname() == null){
-                return new BaseResponse<>(NONE_NICKNAME_EXIST);
+            if (postUserReq.getPassword() == null){
+                return new BaseResponse<>(NONE_PASSWORD_EXIST);
             }
 
             if (userProvider.checkId(postUserReq.getId()) == 1){
@@ -99,18 +99,19 @@ public class UserController {
     @PatchMapping("/{userIdx}")
     public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody PatchUserReq user){
         try {
-            //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
             if(userIdx != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
             }
 
             if (user.getNickname() == null){
                 return new BaseResponse<>(CHANGE_NICKNAME_EXIST);
             }
 
-            //같다면 유저네임 변경
             PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getNickname());
             userService.modifyUserName(patchUserReq);
 
@@ -120,6 +121,158 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    @ResponseBody
+    @GetMapping("/pet")
+    public BaseResponse<List<Pet>> getPetLists() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            List<Pet> resultList = userProvider.getPetbyId(userIdxByJwt);
+            return new BaseResponse<>(resultList);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/pet")
+    public BaseResponse<String> createPet(@RequestBody Pet pet){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            if (pet.getName() == null){
+                return new BaseResponse<>(NONE_NAME_EXIST);
+            }
+
+            if (pet.getImgUrl() == null){
+                return new BaseResponse<>(NONE_IMG_EXIST);
+            }
+
+            if (pet.getType() == null){
+                return new BaseResponse<>(NONE_TYPE_EXIST);
+            }
+
+            if (pet.getBirth() == null){
+                return new BaseResponse<>(NONE_BIRTH_EXIST);
+            }
+
+            if (!isRegexDate(pet.getBirth())){
+                return new BaseResponse<>(POST_USERS_INVALID_DATE);
+            }
+
+            userService.createPet(pet, userIdxByJwt);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/pet/{petIdx}")
+    public BaseResponse<String> updatePet(@PathVariable("petIdx") int petIdx, @RequestBody Pet pet){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            if (pet.getName() == null && pet.getImgUrl() == null && pet.getType() == null && pet.getBirth() == null){
+                return new BaseResponse<>(NONE_UPDATE_EXIST);
+            }
+
+            if (pet.getBirth() != null && !isRegexDate(pet.getBirth())){
+                return new BaseResponse<>(POST_USERS_INVALID_DATE);
+            }
+
+            userService.updatePet(pet, petIdx);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/pet/del/{petIdx}")
+    public BaseResponse<String> deletePet(@PathVariable("petIdx") int petIdx){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            if(userProvider.checkPet(petIdx) == 0){
+                return new BaseResponse<>(NONE_PET_EXIST);
+            }
+
+            userService.deletePet(petIdx);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/book")
+    public BaseResponse<String> createPet(@RequestBody PostUserReq postUserReq){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            if (postUserReq.getTitle() == null){
+                return new BaseResponse<>(NONE_TITLE_EXIST);
+            }
+
+            if (postUserReq.getNickname() == null){
+                return new BaseResponse<>(NONE_NICKNAME_EXIST);
+            }
+
+            userService.createBook(postUserReq, userIdxByJwt);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/book")
+    public BaseResponse<Book> getBook(){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if(userProvider.checkUser(userIdxByJwt) == 0){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            Book result = userProvider.selectBook(userIdxByJwt);
+
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
 
 }

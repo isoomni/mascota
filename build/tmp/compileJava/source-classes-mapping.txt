@@ -4,6 +4,8 @@ com/example/demo/config/Constant.java
  com.example.demo.config.Constant
 com/example/demo/src/diary/model/GetDiaryRes.java
  com.example.demo.src.diary.model.GetDiaryRes
+com/example/demo/src/user/model/Pet.java
+ com.example.demo.src.user.model.Pet
 com/example/demo/utils/ValidationRegex.java
  com.example.demo.utils.ValidationRegex
 com/example/demo/src/user/model/PostLoginRes.java
@@ -20,10 +22,12 @@ com/example/demo/src/diary/model/GetDiaryDetail.java
  com.example.demo.src.diary.model.GetDiaryDetail
 com/example/demo/src/WebSecurityConfig.java
  com.example.demo.src.WebSecurityConfig
-com/example/demo/src/diary/DiaryController.java
- com.example.demo.src.diary.DiaryController
+com/example/demo/src/user/UserProvider.java
+ com.example.demo.src.user.UserProvider
 com/example/demo/src/test/TestController.java
  com.example.demo.src.test.TestController
+com/example/demo/src/user/model/Book.java
+ com.example.demo.src.user.model.Book
 com/example/demo/src/diary/DiaryDao.java
  com.example.demo.src.diary.DiaryDao
  com.example.demo.src.diary.DiaryDao$1
@@ -61,5 +65,5 @@ com/example/demo/src/diary/DiaryService.java
  com.example.demo.src.diary.DiaryService
 com/example/demo/utils/JwtService.java
  com.example.demo.utils.JwtService
-com/example/demo/src/user/UserProvider.java
- com.example.demo.src.user.UserProvider
+com/example/demo/src/diary/DiaryController.java
+ com.example.demo.src.diary.DiaryController

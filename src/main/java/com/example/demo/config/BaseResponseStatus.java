@@ -28,7 +28,7 @@ public enum BaseResponseStatus {
 
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
-    POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
+    POST_USERS_INVALID_DATE(false, 2016, "날짜 형식을 확인해주세요."),
     POST_USERS_EXISTS_ID(false,2017,"중복된 ID입니다."),
     POST_DIARYS_EXISTS_TITLE(false,2018,"제목을 입력해주세요."),
     POST_DIARYS_EXISTS_CONTEXT(false,2019,"내용을 입력해주세요."),
@@ -45,11 +45,20 @@ public enum BaseResponseStatus {
     NONE_ID_EXIST(false,2030,"ID를 입력해주세요."),
     NONE_PASSWORD_EXIST(false,2031,"패스워드를 입력해주세요."),
     NONE_NICKNAME_EXIST(false,2032,"작가명을 입력해주세요."),
+    NONE_TITLE_EXIST(false,2033,"제목을 입력해주세요."),
     CHANGE_NICKNAME_EXIST(false,2033,"변경할 작가명을 입력해주세요."),
     NONE_USER_HAVE(false,2034,"해당 목차의 작가가 아닙니다."),
     NONE_DIARY_EXIST(false,2035,"이미 삭제된 일기입니다."),
     FAIL_LISTS_DEL(false,2036,"목차를 삭제하는데 실패했습니다."),
-
+    FAIL_USER_LEN(false,2037,"작가명은 최대 6글자입니다."),
+    ALREADY_USER_EXIST(false,2038,"중복된 사용자입니다."),
+    NONE_NAME_EXIST(false,2039,"이름을 입력해주세요."),
+    NONE_IMG_EXIST(false,2040,"이미지를 입력해주세요."),
+    NONE_TYPE_EXIST(false,2041,"타입을 입력해주세요."),
+    NONE_BIRTH_EXIST(false,2042,"날짜를 입력해주세요."),
+    NONE_UPDATE_EXIST(false,2043,"변경할 항목이 없습니다."),
+    NONE_PET_EXIST(false,2044,"이미 삭제된 주인공입니다."),
+    NONE_DIARY_WRITE(false,2045,"해당 다이어리의 작성자가 아닙니다."),
 
     /**
      * 3000 : Response 오류

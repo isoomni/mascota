@@ -20,7 +20,7 @@ import java.util.*;
 
 // Service Create, Update, Delete 의 로직 처리
 @Service
-@Transactional
+
 public class DiaryService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -34,7 +34,8 @@ public class DiaryService {
 
     }
 
-    public GetDiaryDetail createDiary(PostDiaryReq postDiaryReq) throws BaseException {
+    @Transactional(rollbackFor = BaseException.class)
+    public int createDiary(PostDiaryReq postDiaryReq) throws BaseException {
         try{
             return diaryDao.postDiary(postDiaryReq);
         } catch (Exception exception) {
@@ -42,37 +43,39 @@ public class DiaryService {
         }
     }
 
-    public void updateDiary(GetDiaryById getDiaryById) throws BaseException {
+    @Transactional(rollbackFor = BaseException.class)
+    public void updateDiary(int idx, GetDiaryById getDiaryById) throws BaseException {
         try{
             GetDiaryDetail now = getDiaryById.getGetDiaryDetail();
             GetDiaryDetail chk = diaryDao.chkDiary(now.getIdx());
-            if (chk == null){
-                throw new BaseException(POST_DIARYS_NONE);
-            }
+
             if (now.getTitle() == null){ now.setTitle(chk.getTitle()); }
             if (now.getContext() == null){ now.setContext(chk.getContext()); }
             if (now.getType() == null){ now.setType(chk.getType()); }
             if (now.getDate() == null){ now.setDate(chk.getDate()); }
-
+            now.setUserIdx(idx);
             getDiaryById.setGetDiaryDetail(now);
 
             int result = diaryDao.updateDiary(getDiaryById);
             if (result == 0){
-                throw new BaseException(FAIL_DIARYS_MODIFY);
+                throw new BaseException(DATABASE_ERROR);
             }
 
         } catch (Exception exception) {
+            if (exception instanceof EmptyResultDataAccessException){
+                throw new BaseException(POST_DIARYS_NONE);
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public void deleteDiary(int diaryIdx) throws BaseException {
+    @Transactional(rollbackFor = BaseException.class)
+    public void deleteDiary(int idx, int diaryIdx) throws BaseException {
         try{
             GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
-
             int result = diaryDao.deleteDiary(diaryIdx);
             if (result == 0){
-                throw new BaseException(FAIL_DIARYS_MODIFY);
+                throw new BaseException(DATABASE_ERROR);
             }
 
         } catch (Exception exception) {
@@ -83,12 +86,13 @@ public class DiaryService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public void insertLists(int userIdx, String context) throws BaseException {
         try{
             List<Lists> chk = diaryDao.getlists(userIdx);
             int result = diaryDao.insertLists(userIdx, context, chk);
             if (result == 0){
-                throw new BaseException(FAIL_LISTS_ADD);
+                throw new BaseException(DATABASE_ERROR);
             }
 
         } catch (Exception exception) {
@@ -96,12 +100,13 @@ public class DiaryService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public void updateLists(int userIdx, List<String> lists) throws BaseException {
         try{
             List<Lists> chk = diaryDao.getlists(userIdx); // 원형
             int result = diaryDao.updateLists(userIdx, lists, chk);
             if (result == 0){
-                throw new BaseException(FAIL_LISTS_ADD);
+                throw new BaseException(DATABASE_ERROR);
             }
 
         } catch (Exception exception) {
@@ -109,11 +114,12 @@ public class DiaryService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public void deleteLists(int listIdx) throws BaseException {
         try{
             int result = diaryDao.deleteLists(listIdx);
             if (result == 0){
-                throw new BaseException(FAIL_LISTS_DEL);
+                throw new BaseException(DATABASE_ERROR);
             }
 
         } catch (Exception exception) {

@@ -20,7 +20,6 @@ import static com.example.demo.config.BaseResponseStatus.*;
 
 // Service Create, Update, Delete 의 로직 처리
 @Service
-@Transactional
 public class UserService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -36,7 +35,8 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    public PostLoginRes createUser(PostUserReq postUserReq) throws BaseException {
+    @Transactional(rollbackFor = BaseException.class)
+    public PostLoginRes createUser(PostLoginReq postUserReq) throws BaseException {
         String pwd;
         try{
             //암호화
@@ -55,6 +55,7 @@ public class UserService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public void modifyUserName(PatchUserReq patchUserReq) throws BaseException {
         try{
             int result = userDao.modifyUserName(patchUserReq);
@@ -62,6 +63,58 @@ public class UserService {
                 throw new BaseException(MODIFY_FAIL_USERNAME);
             }
         } catch(Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public void createPet(Pet pet, int userIdx) throws BaseException {
+        try{
+            int chk = userDao.createPet(pet, userIdx);
+            if (chk == 0){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public void updatePet(Pet pet, int petIdx) throws BaseException {
+        try{
+            int chk = userDao.updatePet(pet, petIdx);
+            if (chk == 0){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public void deletePet(int petIdx) throws BaseException {
+        try{
+            int chk = userDao.deletePet(petIdx);
+            if (chk == 0){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public void createBook(PostUserReq postUserReq, int userIdx) throws BaseException {
+        try{
+            int chk = userDao.createBook(postUserReq, userIdx);
+            if (chk == 0){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
