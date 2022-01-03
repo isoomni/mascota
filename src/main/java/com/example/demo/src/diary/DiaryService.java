@@ -2,126 +2,87 @@ package com.example.demo.src.diary;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
-import com.example.demo.src.diary.model.*;
+import com.example.demo.src.model.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.*;
 import org.springframework.stereotype.Service;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.transaction.annotation.*;
 
 import javax.sql.DataSource;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Optional;
 import static com.example.demo.config.BaseResponseStatus.*;
-import java.util.*;
 
 // Service Create, Update, Delete 의 로직 처리
 @Service
-
+@Transactional
 public class DiaryService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final DiaryDao diaryDao;
     private final DiaryProvider diaryProvider;
+    private final JwtService jwtService;
 
     @Autowired
-    public DiaryService(DiaryDao diaryDao, DiaryProvider diaryProvider) {
-        this.diaryDao = diaryDao;
+    DiaryListRepository diaryListRepository;
+
+    @Autowired
+    public DiaryService(DiaryProvider diaryProvider, JwtService jwtService) {
         this.diaryProvider = diaryProvider;
-
+        this.jwtService = jwtService;
     }
 
-    @Transactional(rollbackFor = BaseException.class)
-    public int createDiary(PostDiaryReq postDiaryReq) throws BaseException {
+    public void insertDiaryList(DiaryListDto diaryListDto, Integer userIdx) throws BaseException {
         try{
-            return diaryDao.postDiary(postDiaryReq);
+            User user = new User(userIdx);
+            List<DiaryList> result = diaryListRepository.findByUserOrderByNumAsc(user);
+            for (DiaryList d : result){
+                if (d.getContext().equals(diaryListDto.getContext())){
+                    throw new BaseException(FAIL_LISTS_ADD);
+                }
+            }
+            Integer number = result.size() + 1;
+            DiaryList insert = new DiaryList(user, diaryListDto, number);
+            diaryListRepository.save(insert);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    @Transactional(rollbackFor = BaseException.class)
-    public void updateDiary(int idx, GetDiaryById getDiaryById) throws BaseException {
+    public void updateDiaryList(List<String> diaryListDto, Integer userIdx) throws BaseException {
         try{
-            GetDiaryDetail now = getDiaryById.getGetDiaryDetail();
-            GetDiaryDetail chk = diaryDao.chkDiary(now.getIdx());
-
-            if (now.getTitle() == null){ now.setTitle(chk.getTitle()); }
-            if (now.getContext() == null){ now.setContext(chk.getContext()); }
-            if (now.getType() == null){ now.setType(chk.getType()); }
-            if (now.getDate() == null){ now.setDate(chk.getDate()); }
-            now.setUserIdx(idx);
-            getDiaryById.setGetDiaryDetail(now);
-
-            int result = diaryDao.updateDiary(getDiaryById);
-            if (result == 0){
-                throw new BaseException(DATABASE_ERROR);
+            User user = new User(userIdx);
+            List<DiaryList> result = diaryListRepository.findByUserOrderByNumAsc(user);
+            System.out.println(result.size() +  " " + diaryListDto.size());
+            if (result.size() != diaryListDto.size()){
+                throw new BaseException(FAIL_LISTS_ADD);
             }
-
-        } catch (Exception exception) {
-            if (exception instanceof EmptyResultDataAccessException){
-                throw new BaseException(POST_DIARYS_NONE);
+            for (int i = 0; i < result.size(); i++){
+                DiaryList update = result.get(i);
+                update.setContext(diaryListDto.get(i));
+                update.setNum(i+1);
+                diaryListRepository.save(update);
             }
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    @Transactional(rollbackFor = BaseException.class)
-    public void deleteDiary(int idx, int diaryIdx) throws BaseException {
-        try{
-            GetDiaryDetail chk = diaryDao.chkDiary(diaryIdx);
-            int result = diaryDao.deleteDiary(diaryIdx);
-            if (result == 0){
-                throw new BaseException(DATABASE_ERROR);
-            }
-
-        } catch (Exception exception) {
-            if (exception instanceof EmptyResultDataAccessException){
-                throw new BaseException(NONE_DIARY_EXIST);
-            }
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    @Transactional(rollbackFor = BaseException.class)
-    public void insertLists(int userIdx, String context) throws BaseException {
-        try{
-            List<Lists> chk = diaryDao.getlists(userIdx);
-            int result = diaryDao.insertLists(userIdx, context, chk);
-            if (result == 0){
-                throw new BaseException(DATABASE_ERROR);
-            }
-
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    @Transactional(rollbackFor = BaseException.class)
-    public void updateLists(int userIdx, List<String> lists) throws BaseException {
+    public void deleteDiaryList(Integer listIdx, Integer userIdx) throws BaseException {
         try{
-            List<Lists> chk = diaryDao.getlists(userIdx); // 원형
-            int result = diaryDao.updateLists(userIdx, lists, chk);
-            if (result == 0){
-                throw new BaseException(DATABASE_ERROR);
+            Optional<DiaryList> result = diaryListRepository.findById(listIdx);
+            if (result.isPresent()) {
+                diaryListRepository.deleteById(listIdx);
             }
-
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    @Transactional(rollbackFor = BaseException.class)
-    public void deleteLists(int listIdx) throws BaseException {
-        try{
-            int result = diaryDao.deleteLists(listIdx);
-            if (result == 0){
-                throw new BaseException(DATABASE_ERROR);
+            else {
+                throw new BaseException(FAIL_LISTS_DEL);
             }
-
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

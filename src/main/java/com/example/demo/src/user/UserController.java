@@ -4,12 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.user.model.*;
+import com.example.demo.src.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.lang.Integer;
 
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -35,88 +36,105 @@ public class UserController {
 
     @ResponseBody
     @GetMapping("/{userIdx}") 
-    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
+    public BaseResponse<UserDto> getUser(@PathVariable("userIdx") Integer userIdx) {
         try{
-            GetUserRes getUserRes = userProvider.getUser(userIdx);
-            return new BaseResponse<>(getUserRes);
+            UserDto result = userProvider.getUser(userIdx);
+            if (result == null){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
+
+            return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostLoginRes> createUser(@RequestBody PostLoginReq postUserReq) {
+    public BaseResponse<UserDto> getUser(@RequestBody SaveUserDto saveUserDto) {
         try{
-            if (postUserReq.getId() == null){
+            if (saveUserDto.getId() == null){
                 return new BaseResponse<>(NONE_ID_EXIST);
             }
 
-            if (userProvider.checkId(postUserReq.getId()) == 1){
-                return new BaseResponse<>(ALREADY_USER_EXIST);
-            }
-
-            if (postUserReq.getPassword() == null){
+            if (saveUserDto.getPassword() == null){
                 return new BaseResponse<>(NONE_PASSWORD_EXIST);
             }
 
-            if (userProvider.checkId(postUserReq.getId()) == 1){
-                return new BaseResponse<>(POST_USERS_EXISTS_ID);
-            }
-
-            PostLoginRes postLoginRes = userService.createUser(postUserReq);
-            return new BaseResponse<>(postLoginRes);
+            UserDto result = userService.createUser(saveUserDto);
+            return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
-    @PostMapping("/logIn")
-    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
+    @PostMapping("/login")
+    public BaseResponse<UserDto> login(@RequestBody SaveUserDto saveUserDto) {
         try{
-            if (postLoginReq.getId() == null){
+            if (saveUserDto.getId() == null){
                 return new BaseResponse<>(NONE_ID_EXIST);
             }
 
-            if (userProvider.checkId(postLoginReq.getId()) == 0){
-                return new BaseResponse<>(NONE_USER_EXIST);
-            }
-
-            if (postLoginReq.getPassword() == null){
+            if (saveUserDto.getPassword() == null){
                 return new BaseResponse<>(NONE_PASSWORD_EXIST);
             }
 
-            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
-            return new BaseResponse<>(postLoginRes);
-        } catch (BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
+            UserDto result = userProvider.login(saveUserDto);
+            return new BaseResponse<>(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
-    @PatchMapping("/{userIdx}")
-    public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody PatchUserReq user){
-        try {
+    @PatchMapping("/book")
+    public BaseResponse<String> login(@RequestBody SaveBookDto saveBookDto) {
+        try{
             int userIdxByJwt = jwtService.getUserIdx();
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
 
-            if(userProvider.checkUser(userIdxByJwt) == 0){
+            if(!userProvider.chkUser(userIdxByJwt)){
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
-            if (user.getNickname() == null){
-                return new BaseResponse<>(CHANGE_NICKNAME_EXIST);
+            if (saveBookDto.getTitle() == null){
+                return new BaseResponse<>(NONE_TITLE_EXIST);
             }
 
-            PatchUserReq patchUserReq = new PatchUserReq(userIdx,user.getNickname());
-            userService.modifyUserName(patchUserReq);
+            if (saveBookDto.getNickname() == null){
+                return new BaseResponse<>(NONE_NICKNAME_EXIST);
+            }
+            userService.createBook(saveBookDto, userIdxByJwt);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("")
+    public BaseResponse<String> modifyPassword(@RequestBody SaveUserDto user){
+        try {
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            if (user.getId() == null){
+                return new BaseResponse<>(NONE_ID_EXIST);
+            }
+
+            if (user.getPassword() == null){
+                return new BaseResponse<>(NONE_PASSWORD_EXIST);
+            }
+
+            if (user.getUpdatepassword() == null){
+                return new BaseResponse<>(NONE_PASSWORD_EXIST);
+            }
+
+            if (!userService.modifyPassword(user)){
+                return new BaseResponse<>(NONE_USER_EXIST);
+            }
 
             String result = "";
-        return new BaseResponse<>(result);
+            return new BaseResponse<>(result);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -124,15 +142,15 @@ public class UserController {
 
     @ResponseBody
     @GetMapping("/pet")
-    public BaseResponse<List<Pet>> getPetLists() {
+    public BaseResponse<List<PetDto>> getPetLists() {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
-            if(userProvider.checkUser(userIdxByJwt) == 0){
+            if(!userProvider.chkUser(userIdxByJwt)){
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
-            List<Pet> resultList = userProvider.getPetbyId(userIdxByJwt);
+            List<PetDto> resultList = userProvider.getPetbyId(userIdxByJwt);
             return new BaseResponse<>(resultList);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -141,11 +159,11 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/pet")
-    public BaseResponse<String> createPet(@RequestBody Pet pet){
-        try {
+    public BaseResponse<List<PetDto>> getPetLists(@RequestBody PetDto pet) {
+        try{
             int userIdxByJwt = jwtService.getUserIdx();
 
-            if(userProvider.checkUser(userIdxByJwt) == 0){
+            if(!userProvider.chkUser(userIdxByJwt)){
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
@@ -153,7 +171,7 @@ public class UserController {
                 return new BaseResponse<>(NONE_NAME_EXIST);
             }
 
-            if (pet.getImgUrl() == null){
+            if (pet.getImgurl() == null){
                 return new BaseResponse<>(NONE_IMG_EXIST);
             }
 
@@ -165,114 +183,44 @@ public class UserController {
                 return new BaseResponse<>(NONE_BIRTH_EXIST);
             }
 
-            if (!isRegexDate(pet.getBirth())){
-                return new BaseResponse<>(POST_USERS_INVALID_DATE);
-            }
-
-            userService.createPet(pet, userIdxByJwt);
-
-            String result = "";
+            List<PetDto> result  = userService.createPet(pet,userIdxByJwt);
             return new BaseResponse<>(result);
-        } catch (BaseException exception) {
+        } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
     @PatchMapping("/pet/{petIdx}")
-    public BaseResponse<String> updatePet(@PathVariable("petIdx") int petIdx, @RequestBody Pet pet){
-        try {
+    public BaseResponse<PetDto> modifyPetLists(@PathVariable("petIdx") int petIdx, @RequestBody PetDto pet) {
+        try{
             int userIdxByJwt = jwtService.getUserIdx();
 
-            if(userProvider.checkUser(userIdxByJwt) == 0){
+            if(!userProvider.chkUser(userIdxByJwt)){
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
-            if (pet.getName() == null && pet.getImgUrl() == null && pet.getType() == null && pet.getBirth() == null){
-                return new BaseResponse<>(NONE_UPDATE_EXIST);
-            }
-
-            if (pet.getBirth() != null && !isRegexDate(pet.getBirth())){
-                return new BaseResponse<>(POST_USERS_INVALID_DATE);
-            }
-
-            userService.updatePet(pet, petIdx);
-
-            String result = "";
+            PetDto result = userService.updatePet(pet, petIdx);
             return new BaseResponse<>(result);
-        } catch (BaseException exception) {
+        } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
-    @PatchMapping("/pet/del/{petIdx}")
-    public BaseResponse<String> deletePet(@PathVariable("petIdx") int petIdx){
-        try {
+    @DeleteMapping("/pet/{petIdx}")
+    public BaseResponse<String> deletePet(@PathVariable("petIdx") int petIdx) {
+        try{
             int userIdxByJwt = jwtService.getUserIdx();
 
-            if(userProvider.checkUser(userIdxByJwt) == 0){
+            if(!userProvider.chkUser(userIdxByJwt)){
                 return new BaseResponse<>(NONE_USER_EXIST);
-            }
-
-            if(userProvider.checkPet(petIdx) == 0){
-                return new BaseResponse<>(NONE_PET_EXIST);
             }
 
             userService.deletePet(petIdx);
-
-            String result = "";
-            return new BaseResponse<>(result);
-        } catch (BaseException exception) {
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
-
-    @ResponseBody
-    @PostMapping("/book")
-    public BaseResponse<String> createPet(@RequestBody PostUserReq postUserReq){
-        try {
-            int userIdxByJwt = jwtService.getUserIdx();
-
-            if(userProvider.checkUser(userIdxByJwt) == 0){
-                return new BaseResponse<>(NONE_USER_EXIST);
-            }
-
-            if (postUserReq.getTitle() == null){
-                return new BaseResponse<>(NONE_TITLE_EXIST);
-            }
-
-            if (postUserReq.getNickname() == null){
-                return new BaseResponse<>(NONE_NICKNAME_EXIST);
-            }
-
-            userService.createBook(postUserReq, userIdxByJwt);
-
-            String result = "";
-            return new BaseResponse<>(result);
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
-
-    @ResponseBody
-    @GetMapping("/book")
-    public BaseResponse<Book> getBook(){
-        try {
-            int userIdxByJwt = jwtService.getUserIdx();
-
-            if(userProvider.checkUser(userIdxByJwt) == 0){
-                return new BaseResponse<>(NONE_USER_EXIST);
-            }
-
-            Book result = userProvider.selectBook(userIdxByJwt);
-
-            return new BaseResponse<>(result);
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
-
-
-
 }
