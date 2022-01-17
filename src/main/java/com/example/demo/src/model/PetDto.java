@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,6 +17,7 @@ public class PetDto {
     private String imgurl;
     private String name;
     private String type;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birth;
 
     public PetDto(Pet entity){

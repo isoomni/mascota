@@ -33,4 +33,11 @@ public class DiaryImg {
         this.diary = diary;
         this.imgurl = imgurl;
     }
+
+    @Builder
+    public DiaryImg(Diary diary, DiaryImgDto diaryImgDto) {
+        this.diary = diary;
+        this.idx = diaryImgDto.getIdx();
+        this.imgurl = diaryImgDto.getImgurl();
+    }
 }

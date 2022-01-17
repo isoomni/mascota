@@ -62,8 +62,8 @@ public class UserProvider {
         }
     }
 
-    public UserDto login(SaveUserDto user) throws BaseException{
-        Optional<User> chk = userRepository.findById(user.getId());
+    public ResponseUser login(SaveUserDto user) throws BaseException{
+        Optional<User> chk = userRepository.selectById(user.getId());
         String chkPassword, password;
         if (chk.isPresent()) {
             chkPassword = chk.get().getPassword();
@@ -80,7 +80,7 @@ public class UserProvider {
         if(user.getPassword().equals(password)){
             String jwt = jwtService.createJwt(chk.get().getIdx());
             chk.get().setJwt(jwt);
-            UserDto result = new UserDto(chk.get());
+            ResponseUser result = new ResponseUser(chk.get());
             return result;
         }
         else{
@@ -91,12 +91,11 @@ public class UserProvider {
     public List<PetDto> getPetbyId(Integer userIdx) throws BaseException{
         try{
             List<PetDto> result = new ArrayList<>();
-            Optional<User> user = userRepository.findByIdx(userIdx);
-            if (user.isPresent()) {
-                user.get().getPets().forEach(p -> {
-                    result.add(new PetDto(p));
-                });
-            }
+            User user = new User(userIdx);
+            List<Pet> cur = petRepository.findByUser(user);
+            cur.forEach(p -> {
+                result.add(new PetDto(p));
+            });
 
             return result;
         } catch (Exception exception){

@@ -7,6 +7,10 @@ import lombok.Setter;
 import lombok.Builder;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,13 +39,36 @@ public class Diary {
     @Column(length = 2000, nullable = false)
     private String context;
 
-    @Column(nullable = true)
-    private Integer type;
-
+    @Temporal(TemporalType.DATE)
     private Date date;
 
-//    @OneToMany(mappedBy="diary")
-//    List<DiaryImg> imgs = new ArrayList<DiaryImg>();
+    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY)
+    Set<DiaryImg> imgurls = new HashSet<>();
+
+    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY)
+    Set<Mood> moods = new HashSet<>();
+
+    public void setByDiaryDto(DiaryDto diaryDto){
+        if (diaryDto.getTitle() != null){
+            this.title = diaryDto.getTitle();
+        }
+        if (diaryDto.getContext() != null){
+            this.context = diaryDto.getContext();
+        }
+        if (diaryDto.getDate() != null){
+            this.date = diaryDto.getDate();
+        }
+    }
+
+    public void addImgs(DiaryImg img){
+        this.imgurls.add(img);
+        img.setDiary(this);
+    }
+
+    public void addMoods(Mood mood){
+        this.moods.add(mood);
+        mood.setDiary(this);
+    }
 
     @Builder
     public Diary(User user, DiaryList diaryList, DiaryDto diaryDto) {
@@ -49,7 +76,7 @@ public class Diary {
         this.diaryList = diaryList;
         this.title = diaryDto.getTitle();
         this.context = diaryDto.getContext();
-        this.type = diaryDto.getType();
         this.date = diaryDto.getDate();
     }
+
 }

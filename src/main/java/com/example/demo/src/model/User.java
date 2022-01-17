@@ -41,7 +41,7 @@ public class User {
     @Transient
     private String jwt;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
     List<Pet> pets = new ArrayList<Pet>();
 
     @Builder

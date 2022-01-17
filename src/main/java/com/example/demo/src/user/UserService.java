@@ -3,6 +3,7 @@ package com.example.demo.src.user;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
 import com.example.demo.src.model.*;
+import com.example.demo.src.diary.DiaryRepository;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -36,12 +37,19 @@ public class UserService {
     PetRepository petRepository;
 
     @Autowired
+    DiaryRepository diaryRepository;
+
+    @Autowired
     public UserService(UserProvider userProvider, JwtService jwtService) {
         this.userProvider = userProvider;
         this.jwtService = jwtService;
     }
 
-    public UserDto createUser(SaveUserDto user) throws BaseException {
+    public ResponseUser createUser(SaveUserDto user) throws BaseException {
+        Optional<User> chk = userRepository.selectById(user.getId());
+        if (chk.isPresent()){
+            throw new BaseException(ALREADY_USER_EXIST);
+        }
         try{
             String pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(user.getPassword());
             user.setPassword(pwd);
@@ -51,11 +59,14 @@ public class UserService {
 
         try{
             User saveUser = userRepository.save(user.toEntity());
-            UserDto result = new UserDto(saveUser);
+            ResponseUser result = new ResponseUser(saveUser);
             String jwt = jwtService.createJwt(saveUser.getIdx());
             result.setJwt(jwt);
             return result;
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -70,6 +81,9 @@ public class UserService {
             }
 
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -84,7 +98,7 @@ public class UserService {
         }
 
         try{
-            Optional<User> result = userRepository.findById(saveUserDto.getId());
+            Optional<User> result = userRepository.selectById(saveUserDto.getId());
             if (result.isPresent()) {
                 User user = result.get();
                 if (!user.getPassword().equals(confirm)){
@@ -98,6 +112,9 @@ public class UserService {
             }
             return false;
         } catch(Exception exception){
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -126,8 +143,13 @@ public class UserService {
                 });
                 return answer;
             }
-            throw new BaseException(DATABASE_ERROR);
+            else{
+                throw new BaseException(DATABASE_ERROR);
+            }
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -154,21 +176,30 @@ public class UserService {
             }
             throw new BaseException(DATABASE_ERROR);
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public void deletePet(Integer petIdx) throws BaseException {
+    public void deletePet(Integer petIdx, Integer userIdx) throws BaseException {
         try{
             Optional<Pet> result = petRepository.findById(petIdx);
             if (result.isPresent()) {
                 Pet now = result.get();
+                User user = new User(userIdx);
+                List<Diary> byPet = diaryRepository.findByNameAndUser(now.getName(),user);
+                diaryRepository.deleteAll(byPet);
                 petRepository.deleteById(petIdx);
             }
             else {
                 throw new BaseException(NONE_PET_EXIST);
             }
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }

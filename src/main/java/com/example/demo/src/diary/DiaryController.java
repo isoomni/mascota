@@ -8,6 +8,10 @@ import com.example.demo.src.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 import java.util.*;
 import java.lang.Integer;
@@ -35,12 +39,16 @@ public class DiaryController {
     }
 
     @ResponseBody
-    @GetMapping("/lists")
-    public BaseResponse<List<DiaryListDto>> getDiaryLists() {
+    @GetMapping("/lists/{type}")
+    public BaseResponse<List<DiaryListDto>> getDiaryLists(@PathVariable("type") int type) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
-            List<DiaryListDto> result = diaryProvider.getDiaryList(userIdxByJwt);
+            if (type != 1 && type != 2){
+                return new BaseResponse<>(NONE_TYPED);
+            }
+
+            List<DiaryListDto> result = diaryProvider.getDiaryList(userIdxByJwt, type);
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -48,15 +56,20 @@ public class DiaryController {
     }
 
     @ResponseBody
-    @PostMapping("/lists")
-    public BaseResponse<String> insertDiaryLists(@RequestBody DiaryListDto diaryListDto) {
+    @PostMapping("/lists/{type}")
+    public BaseResponse<String> insertDiaryLists(@PathVariable("type") int type, @RequestBody DiaryListDto diaryListDto) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
             if (diaryListDto.getContext() == null){
                 return new BaseResponse<>(ADD_LISTS_TEXT_EMPTY);
             }
-            diaryService.insertDiaryList(diaryListDto, userIdxByJwt);
+
+            if (type != 1 && type != 2){
+                return new BaseResponse<>(NONE_TYPED);
+            }
+
+            diaryService.insertDiaryList(diaryListDto, userIdxByJwt, type);
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -64,8 +77,8 @@ public class DiaryController {
     }
 
     @ResponseBody
-    @PatchMapping("/lists")
-    public BaseResponse<String> updateDiaryList(@RequestBody UpdateDiaryListsDto diaryListDto) {
+    @PatchMapping("/lists/{type}")
+    public BaseResponse<String> updateDiaryList(@PathVariable("type") int type, @RequestBody UpdateDiaryListsDto diaryListDto) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
 
@@ -74,7 +87,12 @@ public class DiaryController {
                     return new BaseResponse<>(ADD_LISTS_TEXT_EMPTY);
                 }
             }
-            diaryService.updateDiaryList(diaryListDto.getLists(), userIdxByJwt);
+
+            if (type != 1 && type != 2){
+                return new BaseResponse<>(NONE_TYPED);
+            }
+
+            diaryService.updateDiaryList(diaryListDto.getLists(), userIdxByJwt, type);
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -89,6 +107,85 @@ public class DiaryController {
 
             diaryService.deleteDiaryList(listIdx, userIdxByJwt);
             return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/{listIdx}")
+    public BaseResponse<String> insertDiary(@PathVariable("listIdx") Integer listIdx, @RequestBody DiaryDto diaryDto) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            diaryService.insertDiary(listIdx, diaryDto, userIdxByJwt);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/{diaryIdx}")
+    public BaseResponse<String> updateDiary(@PathVariable("diaryIdx") Integer diaryIdx, @RequestBody DiaryDto diaryDto) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            diaryService.updateDiary(diaryIdx, diaryDto, userIdxByJwt);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/{diaryIdx}")
+    public BaseResponse<String> deleteDiary(@PathVariable("diaryIdx") Integer diaryIdx) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            diaryService.deleteDiary(diaryIdx, userIdxByJwt);
+            return new BaseResponse<>("");
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/{diaryIdx}")
+    public BaseResponse<ResponseDiaryDto> getDiary(@PathVariable("diaryIdx") Integer diaryIdx) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            ResponseDiaryDto result = diaryProvider.getDiary(diaryIdx);
+            return new BaseResponse<>(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/home/{type}")
+    public BaseResponse<ResponseDiaryHome> getDiaryHome(@PathVariable("type") Integer type, @RequestParam(required = false) Integer listIdx, @PageableDefault(size = 10) Pageable pageable) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (type != 1 && type != 2){
+                return new BaseResponse<>(NONE_TYPED);
+            }
+
+            ResponseDiaryHome result = diaryProvider.getDiaryHome(userIdxByJwt,type,listIdx, pageable);
+
+            return new BaseResponse<>(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/help")
+    public BaseResponse<HelpHome> getDiaryHelp() {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            HelpHome result = diaryProvider.getDiaryHelp(userIdxByJwt);
+
+            return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.Builder;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -31,12 +33,14 @@ public class DiaryList {
     @Column(nullable = true)
     private Integer num;
 
-    private String status = "N";
-
+    @Column(nullable = false)
+    private Integer type;
+    
     @Builder
-    public DiaryList(User user, DiaryListDto diaryListDto, Integer num) {
+    public DiaryList(User user, DiaryListDto diaryListDto, Integer num, Integer type) {
         this.user = user;
         this.context = diaryListDto.getContext();
         this.num = num;
+        this.type = type;
     }
 }

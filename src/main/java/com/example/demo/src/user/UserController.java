@@ -51,7 +51,7 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<UserDto> getUser(@RequestBody SaveUserDto saveUserDto) {
+    public BaseResponse<ResponseUser> createUser(@RequestBody SaveUserDto saveUserDto) {
         try{
             if (saveUserDto.getId() == null){
                 return new BaseResponse<>(NONE_ID_EXIST);
@@ -61,7 +61,7 @@ public class UserController {
                 return new BaseResponse<>(NONE_PASSWORD_EXIST);
             }
 
-            UserDto result = userService.createUser(saveUserDto);
+            ResponseUser result = userService.createUser(saveUserDto);
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -70,7 +70,7 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/login")
-    public BaseResponse<UserDto> login(@RequestBody SaveUserDto saveUserDto) {
+    public BaseResponse<ResponseUser> login(@RequestBody SaveUserDto saveUserDto) {
         try{
             if (saveUserDto.getId() == null){
                 return new BaseResponse<>(NONE_ID_EXIST);
@@ -80,7 +80,7 @@ public class UserController {
                 return new BaseResponse<>(NONE_PASSWORD_EXIST);
             }
 
-            UserDto result = userProvider.login(saveUserDto);
+            ResponseUser result = userProvider.login(saveUserDto);
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -217,7 +217,7 @@ public class UserController {
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
-            userService.deletePet(petIdx);
+            userService.deletePet(petIdx,userIdxByJwt);
             return new BaseResponse<>("");
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

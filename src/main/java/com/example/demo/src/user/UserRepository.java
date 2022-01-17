@@ -13,7 +13,7 @@ import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM user as u WHERE u.id = :id")
-    Optional<User> findById(@Param("id") String id);
+    Optional<User> selectById(@Param("id") String id);
 
     @EntityGraph(attributePaths = "pets")
     @Query("select u from user u where u.idx = :idx")

@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
@@ -19,9 +19,8 @@ public class UserDto {
     private String imgurl;
     private String title;
     private String jwt;
-    private Integer user_id;
 
-    Set<PetDto> pets = new HashSet<>();
+    List<PetDto> pets = new ArrayList<>();
 
     public UserDto(User entity){
         this.idx = entity.getIdx();

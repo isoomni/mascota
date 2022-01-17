@@ -32,9 +32,11 @@ public class Mood {
     private String type;
 
     @Builder
-    public Mood(Diary diary, String name, String type) {
+    public Mood(Diary diary, MoodDto moodDto) {
         this.diary = diary;
-        this.name = name;
-        this.type = type;
+        this.idx = moodDto.getIdx();
+        this.name = moodDto.getName();
+        this.type = moodDto.getType();
     }
+    
 }
