@@ -115,3 +115,13 @@ com/example/demo/src/home/HomeProvider.java
  com.example.demo.src.home.HomeProvider
 com/example/demo/src/home/HomeDao.java
  com.example.demo.src.home.HomeDao
+com/example/demo/src/ready/ReadyService.java
+ com.example.demo.src.ready.ReadyService
+com/example/demo/src/ready/ReadyProvider.java
+ com.example.demo.src.ready.ReadyProvider
+com/example/demo/src/ready/model/GetReadyRes.java
+ com.example.demo.src.ready.model.GetReadyRes
+com/example/demo/src/ready/ReadyController.java
+ com.example.demo.src.ready.ReadyController
+com/example/demo/src/ready/ReadyDao.java
+ com.example.demo.src.ready.ReadyDao
