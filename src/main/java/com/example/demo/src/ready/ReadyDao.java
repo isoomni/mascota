@@ -28,7 +28,7 @@ public class ReadyDao {
     public List<GetReadyRes> getReady(int userIdx, int petIdx){
         String getReadyQuery = "SELECT rq.idx as questionNum, " +
                 "REPLACE(rq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
-                "       CASE WHEN ra.status = 'Y' AND ra.petIdx = 8 THEN 'Y'\n" +
+                "       CASE WHEN ra.status = 'Y' AND ra.petIdx = ? THEN 'Y'\n" +
                 "            ELSE 'N'\n" +
                 "            END AS existenceOfAnswer\n" +
                 "FROM ready_question rq\n" +
@@ -41,7 +41,7 @@ public class ReadyDao {
                         rs.getInt("questionNum"),
                         rs.getString("question"),
                         rs.getString("existenceOfAnswer")
-                ),getReadyParams2);
+                ),getReadyParams2, getReadyParams2);
     }
 
     /**
@@ -56,7 +56,7 @@ public class ReadyDao {
                 "FROM ready_question rq\n" +
                 "         LEFT JOIN ready_answer ra on rq.idx = ra.rqIdx\n" +
                 "LEFT JOIN pet p on ra.petIdx = p.idx\n" +
-                "WHERE ra.idx = 2;";
+                "WHERE ra.idx = ?;";
 
 
         int getReadyParams2 = readyAnswerIdx;

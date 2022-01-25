@@ -5,8 +5,6 @@ import com.example.demo.config.BaseResponse;
 import com.example.demo.src.memory.model.GetAnsweredMemoryRes;
 import com.example.demo.src.memory.model.GetNotAnsweredMemoryRes;
 import com.example.demo.src.memory.model.GetOneMemoryRes;
-import com.example.demo.src.ready.model.GetOneReadyRes;
-import com.example.demo.src.ready.model.GetReadyRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,7 @@ import java.util.List;
 import static com.example.demo.config.BaseResponseStatus.*;
 
 @RestController
-@RequestMapping("/memory")
+@RequestMapping("/memories")
 public class MemoryController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -37,11 +35,11 @@ public class MemoryController {
 
     /**
      * 추억하기 전체 질문 조회 (답변하기 탭)
-     * [GET] /ready/:userIdx/:petIdx
+     * [GET] /memories/notAnsweredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetNotAnsweredMemoryRes>>
      * */
     @ResponseBody
-    @GetMapping("/{userIdx}/{petIdx}")
+    @GetMapping("/notAnsweredMemories/{userIdx}/{petIdx}")
     public BaseResponse<List<GetNotAnsweredMemoryRes>> getNotAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx){
         // Get Users
         try{
@@ -60,18 +58,13 @@ public class MemoryController {
         }
     }
 
-
-
-
-
-
     /**
      * 추억하기 전체 질문 조회 (모아보기 탭) (질문인덱스순, 최신순, 오래된순)
-     * [GET] /ready/:userIdx/:petIdx
+     * [GET] /memories/answeredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetAnsweredMemoryRes>>
      * */
     @ResponseBody
-    @GetMapping("/{userIdx}/{petIdx}")
+    @GetMapping("/answeredMemories/{userIdx}/{petIdx}")
     public BaseResponse<List<GetAnsweredMemoryRes>> getAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx, @RequestParam(required = false) String order){
         // Get Users
         try{
@@ -106,12 +99,12 @@ public class MemoryController {
 
     /**
      * 추억하기 개별 질문 조회
-     * [GET] /ready/:userIdx/:readyAnswerIdx
+     * [GET] /memories/:userIdx/:readyAnswerIdx
      * @return BaseResponse<List<GetOneMemoryRes>>
      * */
     @ResponseBody
-    @GetMapping("/{userIdx}/{readyAnswerIdx}")
-    public BaseResponse<List<GetOneMemoryRes>> getOneMemory(@PathVariable("userIdx") int userIdx, @PathVariable("readyAnswerIdx") int readyAnswerIdx){
+    @GetMapping("/one/{userIdx}/{memoryAnswerIdx}")
+    public BaseResponse<List<GetOneMemoryRes>> getOneMemory(@PathVariable("userIdx") int userIdx, @PathVariable("memoryAnswerIdx") int memoryAnswerIdx){
         // Get Users
         try{
             //jwt에서 idx 추출.
@@ -121,12 +114,36 @@ public class MemoryController {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
             // 같다면
-            List<GetOneMemoryRes> getOneMemoryRes = memoryProvider.getOneMemory(userIdx, readyAnswerIdx);
+            List<GetOneMemoryRes> getOneMemoryRes = memoryProvider.getOneMemory(userIdx, memoryAnswerIdx);
             return new BaseResponse<>(getOneMemoryRes);
 
         }  catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
+
+    /**
+     * 로그 테스트 API
+     * [GET] /test/log
+     * @return String
+     */
+    @ResponseBody
+    @GetMapping("/log")
+    public String getAll() {
+        System.out.println("테스트");
+//        trace, debug 레벨은 Console X, 파일 로깅 X
+//        logger.trace("TRACE Level 테스트");
+//        logger.debug("DEBUG Level 테스트");
+
+//        info 레벨은 Console 로깅 O, 파일 로깅 X
+        logger.info("INFO Level 테스트");
+//        warn 레벨은 Console 로깅 O, 파일 로깅 O
+        logger.warn("Warn Level 테스트");
+//        error 레벨은 Console 로깅 O, 파일 로깅 O (app.log 뿐만 아니라 error.log 에도 로깅 됨)
+//        app.log 와 error.log 는 날짜가 바뀌면 자동으로 *.gz 으로 압축 백업됨
+        logger.error("ERROR Level 테스트");
+
+        return "Success Test";
     }
 
 

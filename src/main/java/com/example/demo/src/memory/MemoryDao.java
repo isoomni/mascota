@@ -27,14 +27,14 @@ public class MemoryDao {
      * @return BaseResponse<List<GetNotAnsweredMemoryRes>>
      * */
     public List<GetNotAnsweredMemoryRes> getNotAnsweredMemory(int userIdx, int petIdx){
-        String Query = "SELECT mq.idx AS questionNum, " +
-                "REPLACE(mq.context, '*', " +
-                "(SELECT p.name FROM pet p WHERE p.idx = ?)) as question," +
-                " ma.context AS answer\n" +
+        String Query = "SELECT mq.idx as questionNum, " +
+                "REPLACE(mq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
+                "       (SELECT ma.context FROM memory_answer ma " +
+                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx) as answer\n" +
                 "FROM memory_question mq\n" +
-                "         LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
-                "WHERE ISNULL(ma.context)\n" +
-                ";";
+                "LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
+                "where (SELECT ma.context FROM memory_answer ma " +
+                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx) is null;";
 
         int Params = petIdx;
 
@@ -43,7 +43,7 @@ public class MemoryDao {
                         rs.getInt("questionNum"),
                         rs.getString("question"),
                         rs.getString("answer")
-                ),Params);
+                ),Params, Params, Params);
     }
 
 
@@ -56,30 +56,35 @@ public class MemoryDao {
     public List<GetAnsweredMemoryRes> getAnsweredMemory(int petIdx, String order){
         // 기본 - 질문 인덱스 순
         String Query1 = "SELECT mq.idx AS questionNum,\n" +
-                "       REPLACE(mq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
-                "       ma.context AS answer, date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
-                "FROM memory_question mq\n" +
-                "         LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.context IS NOT NULL\n" +
-                "ORDER BY questionNum\n" +
-                ";";
+                "       REPLACE(mq.context, '*', p.name) as question,\n" +
+                "       ma.context AS answer\n" +
+                "        , date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
+                "FROM pet p\n" +
+                "    LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
+                "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
+                "WHERE ma.petIdx = ?\n" +
+                "ORDER BY questionNum;";
         // 최신순
-        String Query2 = "SELECT mq.idx AS questionNum, REPLACE(mq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
-                "       ma.context AS answer, ma.updatedAt\n" +
-                "FROM memory_question mq\n" +
-                "         LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.context IS NOT NULL\n" +
-                "ORDER BY ma.updatedAt DESC\n" +
-                ";";
+        String Query2 = "SELECT mq.idx AS questionNum,\n" +
+                "       REPLACE(mq.context, '*', p.name) as question,\n" +
+                "       ma.context AS answer\n" +
+                "        , date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
+                "FROM pet p\n" +
+                "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
+                "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
+                "WHERE ma.petIdx = ?\n" +
+                "ORDER BY ma.updatedAt DESC;";
 
         // 오래된 순
-        String Query3 = "SELECT mq.idx AS questionNum, REPLACE(mq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
-                "       ma.context AS answer, ma.updatedAt\n" +
-                "FROM memory_question mq\n" +
-                "         LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.context IS NOT NULL\n" +
-                "ORDER BY ma.updatedAt ASC\n" +
-                ";";
+        String Query3 = "SELECT mq.idx AS questionNum,\n" +
+                "       REPLACE(mq.context, '*', p.name) as question,\n" +
+                "       ma.context AS answer\n" +
+                "        , date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
+                "FROM pet p\n" +
+                "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
+                "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
+                "WHERE ma.petIdx = ?\n" +
+                "ORDER BY ma.updatedAt ASC;";
 
         int Params = petIdx;
 
@@ -119,16 +124,16 @@ public class MemoryDao {
      * [GET] /ready/:userIdx/:readyAnswerIdx
      * @return BaseResponse<List<GetOneMemoryRes>>
      * */
-    public List<GetOneMemoryRes> getOneMemory(int userIdx, int petIdx){
-        String Query = "SELECT mq.idx as questionNum, REPLACE(mq.context, '*', p.name) as question, " +
-                "ma.context as answer\n" +
-                "    ,date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
-                "FROM memory_question mq\n" +
-                "         LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
-                "         LEFT JOIN pet p on ma.petIdx = p.idx\n" +
-                "WHERE ma.idx = 2;";
+    public List<GetOneMemoryRes> getOneMemory(int userIdx, int memoryAnswerIdx){
+        String Query = "SELECT mq.idx as questionNum, REPLACE(mq.context, '*', p.name) as question,\n" +
+                "       ma.context AS answer\n" +
+                "        , date_format(ma.updatedAt, '%Y년 %m월 %d일') as updatedAt\n" +
+                "FROM pet p\n" +
+                "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
+                "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
+                "WHERE ma.idx = ? and ma.mqIdx = mq.idx and ma.context IS NOT NULL;";
 
-        int Params = petIdx;
+        int Params = memoryAnswerIdx;
 
         return this.jdbcTemplate.query(Query,
                 (rs, rowNum) -> new GetOneMemoryRes(
@@ -138,4 +143,7 @@ public class MemoryDao {
                         rs.getString("updatedAt")
                 ),Params);
     }
+
+
+
 }
