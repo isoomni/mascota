@@ -61,6 +61,7 @@ public enum BaseResponseStatus {
     NONE_DIARY_WRITE(false,2045,"해당 다이어리의 작성자가 아닙니다."),
     NONE_TYPED(false,2046,"타입 형식을 올바르게 입력해주세요."),
     NONE_PAGE(false,2047,"해당 페이지는 존재하지 않습니다."),
+    UNVALID_FILTER(false, 2048, "해당하는 필터가 없습니다."),
 
     /**
      * 3000 : Response 오류

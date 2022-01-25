@@ -47,9 +47,10 @@ public class MemoryProvider {
      * [GET] /ready/:userIdx/:petIdx
      * @return BaseResponse<List<GetAnsweredMemoryRes>>
      * */
-    public List<GetAnsweredMemoryRes> getAnsweredMemory(int userIdx, int petIdx) throws BaseException {
+    // 질문인덱스순
+    public List<GetAnsweredMemoryRes> getAnsweredMemory(int petIdx, String order) throws BaseException {
         try{
-            List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryDao.getAnsweredMemory(userIdx, petIdx);
+            List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryDao.getAnsweredMemory(petIdx, order);
             return getAnsweredMemoryRes;
         } catch (Exception exception) {
             exception.printStackTrace();

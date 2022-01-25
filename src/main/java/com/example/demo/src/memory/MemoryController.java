@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.example.demo.config.BaseResponseStatus.INVALID_USER_JWT;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @RestController
 @RequestMapping("/memory")
@@ -72,7 +72,7 @@ public class MemoryController {
      * */
     @ResponseBody
     @GetMapping("/{userIdx}/{petIdx}")
-    public BaseResponse<List<GetAnsweredMemoryRes>> getAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx){
+    public BaseResponse<List<GetAnsweredMemoryRes>> getAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx, @RequestParam(required = false) String order){
         // Get Users
         try{
             //jwt에서 idx 추출.
@@ -81,9 +81,20 @@ public class MemoryController {
             if(userIdx != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
-            // 같다면
-            List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(userIdx, petIdx);
-            return new BaseResponse<>(getAnsweredMemoryRes);
+            if (order == null){ // 필터 적용이 하나도 없으면 다음과 같이
+                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
+                return new BaseResponse<>(getAnsweredMemoryRes);
+            }
+            if (order == "latest") {
+                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
+                return new BaseResponse<>(getAnsweredMemoryRes);
+            }
+            if (order == "oldest"){
+                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
+                return new BaseResponse<>(getAnsweredMemoryRes);
+            }
+            else {return new BaseResponse<>(UNVALID_FILTER);}// 필터 적용 불가
+
 
         }  catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
