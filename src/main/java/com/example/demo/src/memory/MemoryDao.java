@@ -1,8 +1,8 @@
 package com.example.demo.src.memory;
 
-import com.example.demo.src.memory.model.GetAnsweredMemoryRes;
-import com.example.demo.src.memory.model.GetNotAnsweredMemoryRes;
-import com.example.demo.src.memory.model.GetOneMemoryRes;
+import com.example.demo.src.memory.model.*;
+import com.example.demo.src.ready.model.PatchReadyAnswerReq;
+import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -142,6 +142,30 @@ public class MemoryDao {
                         rs.getString("answer"),
                         rs.getString("updatedAt")
                 ),Params);
+    }
+
+    /**
+     * 추억하기 개별 답변 작성 API
+     * [PATCH] /memories/one/:userIdx/:petIdx/:memoryQuestionIdx
+     * @return BaseResponse<String>
+     */
+    public int createMemoryAnswer(PostMemoryAnswerReq postMemoryAnswerReq){
+        String createUserQuery = "insert into ready_answer (petIdx, rqIdx, context) VALUES (?,?,?)";
+        Object[] createUserParams = new Object[]{postMemoryAnswerReq.getPetIdx(), postMemoryAnswerReq.getMemoryQuestionIdx(), postMemoryAnswerReq.getContext()};
+
+        return this.jdbcTemplate.update(createUserQuery, createUserParams);
+    }
+
+    /**
+     * 추억하기 개별 답변 수정 API
+     * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
+     * @return BaseResponse<String>
+     */
+    public int modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq){
+        String modifyUserNameQuery = "update ready_answer set context where idx = ? ";
+        Object[] modifyUserNameParams = new Object[]{patchMemoryAnswerReq.getContext(), patchMemoryAnswerReq.getMemoryAnswerIdx()};
+
+        return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
     }
 
 

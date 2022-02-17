@@ -1,18 +1,67 @@
 package com.example.demo.src.memory;
 
+
+import com.example.demo.config.BaseException;
+import com.example.demo.src.memory.model.PatchMemoryAnswerReq;
+import com.example.demo.src.memory.model.PostMemoryAnswerReq;
+import com.example.demo.src.ready.model.PatchReadyAnswerReq;
+import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.example.demo.config.BaseResponseStatus.MODIFY_FAIL;
 
 @Service
 public class MemoryService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final MemoryDao memoryDao;
+    private final MemoryProvider memoryProvider;
 
+    @Autowired
+    public MemoryService(MemoryDao memoryDao, MemoryProvider memoryProvider){
+        this.memoryDao = memoryDao;
+        this.memoryProvider = memoryProvider;
+    }
 
+    /**
+     * 추억하기 개별 답변 작성 API
+     * [PATCH] /memories/one/:userIdx/:petIdx/:memoryQuestionIdx
+     * @return BaseResponse<String>
+     */
+    public void createMemoryAnswer(PostMemoryAnswerReq postMemoryAnswerReq) throws BaseException {
+        try{
+            int result = memoryDao.createMemoryAnswer(postMemoryAnswerReq);
+            if(result == 0){
+                throw new BaseException(MODIFY_FAIL);
+            }
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
+    /**
+     * 추억하기 개별 답변 수정 API
+     * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
+     * @return BaseResponse<String>
+     */
+    public void modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq) throws BaseException {
+        try{
+            int result = memoryDao.modifyMemoryAnswer(patchMemoryAnswerReq);
+            if(result == 0){
+                throw new BaseException(MODIFY_FAIL);
+            }
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

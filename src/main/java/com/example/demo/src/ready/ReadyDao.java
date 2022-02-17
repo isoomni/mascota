@@ -3,6 +3,8 @@ package com.example.demo.src.ready;
 import com.example.demo.src.home.model.GetHomeRes;
 import com.example.demo.src.ready.model.GetOneReadyRes;
 import com.example.demo.src.ready.model.GetReadyRes;
+import com.example.demo.src.ready.model.PatchReadyAnswerReq;
+import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -68,6 +70,30 @@ public class ReadyDao {
                         rs.getString("answer"),
                         rs.getString("updatedAt")
                 ),getReadyParams2);
+    }
+
+    /**
+     * 준비하기 개별 답변 작성 API
+     * [PATCH] /readies/ones/:userIdx/:readyQuestionIdx
+     * @return BaseResponse<String>
+     */
+    public int createReadyAnswer(PostReadyAnswerReq postReadyAnswerReq){
+        String createUserQuery = "insert into ready_answer (petIdx, rqIdx, context) VALUES (?,?,?)";
+        Object[] createUserParams = new Object[]{postReadyAnswerReq.getPetIdx(), postReadyAnswerReq.getReadyQuestionIdx(), postReadyAnswerReq.getContext()};
+
+        return this.jdbcTemplate.update(createUserQuery, createUserParams);
+    }
+
+    /**
+     * 준비하기 개별 답변 수정 API
+     * [PATCH] /readies/ones/:userIdx/:readyAnswerIdx
+     * @return BaseResponse<String>
+     */
+    public int modifyReadyAnswer(PatchReadyAnswerReq patchReadyAnswerReq){
+        String modifyUserNameQuery = "update ready_answer set context where idx = ? ";
+        Object[] modifyUserNameParams = new Object[]{patchReadyAnswerReq.getContext(), patchReadyAnswerReq.getReadyAnswerIdx()};
+
+        return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
     }
 
 }

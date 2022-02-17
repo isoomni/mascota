@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetReadyRes {
-    private int questionNum;
-    private String question;
-    private String existenceOfAnswer;
+public class PostReadyAnswerReq {
+    private int petIdx;
+    private int readyQuestionIdx;
+    private String context;
 }

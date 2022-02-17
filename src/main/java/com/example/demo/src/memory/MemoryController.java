@@ -2,9 +2,11 @@ package com.example.demo.src.memory;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.memory.model.GetAnsweredMemoryRes;
-import com.example.demo.src.memory.model.GetNotAnsweredMemoryRes;
-import com.example.demo.src.memory.model.GetOneMemoryRes;
+import com.example.demo.src.memory.model.*;
+import com.example.demo.src.ready.model.PatchReadyAnswer;
+import com.example.demo.src.ready.model.PatchReadyAnswerReq;
+import com.example.demo.src.ready.model.PostReadyAnswer;
+import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +37,11 @@ public class MemoryController {
 
     /**
      * 추억하기 전체 질문 조회 (답변하기 탭)
-     * [GET] /memories/notAnsweredMemories/:userIdx/:petIdx
+     * [GET] /memories/all/notAnsweredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetNotAnsweredMemoryRes>>
      * */
     @ResponseBody
-    @GetMapping("/notAnsweredMemories/{userIdx}/{petIdx}")
+    @GetMapping("/all/notAnsweredMemories/{userIdx}/{petIdx}")
     public BaseResponse<List<GetNotAnsweredMemoryRes>> getNotAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx){
         // Get Users
         try{
@@ -60,11 +62,11 @@ public class MemoryController {
 
     /**
      * 추억하기 전체 질문 조회 (모아보기 탭) (질문인덱스순, 최신순, 오래된순)
-     * [GET] /memories/answeredMemories/:userIdx/:petIdx
+     * [GET] /memories/all/answeredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetAnsweredMemoryRes>>
      * */
     @ResponseBody
-    @GetMapping("/answeredMemories/{userIdx}/{petIdx}")
+    @GetMapping("/all/answeredMemories/{userIdx}/{petIdx}")
     public BaseResponse<List<GetAnsweredMemoryRes>> getAnsweredMemory(@PathVariable("userIdx") int userIdx, @PathVariable("petIdx") int petIdx, @RequestParam(required = false) String order){
         // Get Users
         try{
@@ -99,7 +101,7 @@ public class MemoryController {
 
     /**
      * 추억하기 개별 질문 조회
-     * [GET] /memories/:userIdx/:readyAnswerIdx
+     * [GET] /memories/one/:userIdx/:readyAnswerIdx
      * @return BaseResponse<List<GetOneMemoryRes>>
      * */
     @ResponseBody
@@ -121,6 +123,59 @@ public class MemoryController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 추억하기 개별 답변 작성 API
+     * [PATCH] /memories/one/:userIdx/:petIdx/:memoryQuestionIdx
+     * @return BaseResponse<String>
+     */
+    @ResponseBody
+    @PatchMapping("/one/{userIdx}/{petIdx}/{memoryQuestionIdx}")
+    public BaseResponse<String> createMemoryAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("petIdx") int petIdx,@PathVariable("memoryQuestionIdx") int memoryQuestionIdx, @RequestBody PostMemoryAnswer postMemoryAnswer){
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
+            //같다면 유저네임 변경
+            PostMemoryAnswerReq postMemoryAnswerReq = new PostMemoryAnswerReq(petIdx,memoryQuestionIdx, postMemoryAnswer.getContext());
+            memoryService.createMemoryAnswer(postMemoryAnswerReq);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 추억하기 개별 답변 수정 API
+     * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
+     * @return BaseResponse<String>
+     */
+    @ResponseBody
+    @PatchMapping("/one/{userIdx}/{memoryAnswerIdx}")
+    public BaseResponse<String> modifyMemoryAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("memoryAnswerIdx") int memoryAnswerIdx, @RequestBody PatchMemoryAnswer patchMemoryAnswer){
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
+            //같다면 유저네임 변경
+            PatchMemoryAnswerReq patchMemoryAnswerReq = new PatchMemoryAnswerReq(userIdx,memoryAnswerIdx, patchMemoryAnswer.getContext());
+            memoryService.modifyMemoryAnswer(patchMemoryAnswerReq);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 로그 테스트 API
