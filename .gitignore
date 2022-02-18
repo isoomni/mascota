@@ -3,5 +3,6 @@
 build/*
 gradle/*
 logs/*
-src/main/java/com/example/demo/config/*
+src/main/java/com/example/demo/config/secret
 src/main/resources/*
+.gitignore
