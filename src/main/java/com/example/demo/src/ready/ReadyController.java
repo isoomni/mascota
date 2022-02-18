@@ -82,11 +82,11 @@ public class ReadyController {
 
     /**
      * 준비하기 개별 답변 작성 API
-     * [PATCH] /readies/one/:userIdx/:petIdx/:readyQuestionIdx
+     * [POST] /readies/one/answer/:userIdx/:petIdx/:readyQuestionIdx
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/one/{userIdx}/{petIdx}/{readyAnswerIdx}")
+    @PostMapping ("/one/answer/{userIdx}/{petIdx}/{readyQuestionIdx}")
     public BaseResponse<String> createReadyAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("petIdx") int petIdx,@PathVariable("readyQuestionIdx") int readyQuestionIdx, @RequestBody PostReadyAnswer postReadyAnswer){
         try {
             //jwt에서 idx 추출.
@@ -108,11 +108,11 @@ public class ReadyController {
 
     /**
      * 준비하기 개별 답변 수정 API
-     * [PATCH] /readies/one/:userIdx/:readyAnswerIdx
+     * [PATCH] /readies/one/answer/:userIdx/:readyAnswerIdx
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/one/{userIdx}/{readyAnswerIdx}")
+    @PatchMapping("/one/answer/{userIdx}/{readyAnswerIdx}")
     public BaseResponse<String> modifyReadyAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("readyAnswerIdx") int readyAnswerIdx, @RequestBody PatchReadyAnswer patchReadyAnswer){
         try {
             //jwt에서 idx 추출.
@@ -122,7 +122,7 @@ public class ReadyController {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
             //같다면 유저네임 변경
-            PatchReadyAnswerReq patchReadyAnswerReq = new PatchReadyAnswerReq(userIdx,readyAnswerIdx, patchReadyAnswer.getContext());
+            PatchReadyAnswerReq patchReadyAnswerReq = new PatchReadyAnswerReq(readyAnswerIdx, patchReadyAnswer.getContext());
             readyService.modifyReadyAnswer(patchReadyAnswerReq);
 
             String result = "";

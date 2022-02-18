@@ -97,7 +97,7 @@ public class MemoryDao {
                             rs.getString("updatedAt")
                     ),Params);
         }
-        if (order == "latest"){
+        if (order.equals("latest")){
             return this.jdbcTemplate.query(Query3,
                     (rs, rowNum) -> new GetAnsweredMemoryRes(
                             rs.getInt("questionNum"),
@@ -150,7 +150,7 @@ public class MemoryDao {
      * @return BaseResponse<String>
      */
     public int createMemoryAnswer(PostMemoryAnswerReq postMemoryAnswerReq){
-        String createUserQuery = "insert into ready_answer (petIdx, rqIdx, context) VALUES (?,?,?)";
+        String createUserQuery = "insert into memory_answer (petIdx, mqIdx, context) VALUES (?,?,?)";
         Object[] createUserParams = new Object[]{postMemoryAnswerReq.getPetIdx(), postMemoryAnswerReq.getMemoryQuestionIdx(), postMemoryAnswerReq.getContext()};
 
         return this.jdbcTemplate.update(createUserQuery, createUserParams);
@@ -162,7 +162,7 @@ public class MemoryDao {
      * @return BaseResponse<String>
      */
     public int modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq){
-        String modifyUserNameQuery = "update ready_answer set context where idx = ? ";
+        String modifyUserNameQuery = "update memory_answer set context where idx = ? ";
         Object[] modifyUserNameParams = new Object[]{patchMemoryAnswerReq.getContext(), patchMemoryAnswerReq.getMemoryAnswerIdx()};
 
         return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);

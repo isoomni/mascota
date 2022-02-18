@@ -90,7 +90,7 @@ public class ReadyDao {
      * @return BaseResponse<String>
      */
     public int modifyReadyAnswer(PatchReadyAnswerReq patchReadyAnswerReq){
-        String modifyUserNameQuery = "update ready_answer set context where idx = ? ";
+        String modifyUserNameQuery = "update ready_answer set context = ? where idx = ? ";
         Object[] modifyUserNameParams = new Object[]{patchReadyAnswerReq.getContext(), patchReadyAnswerReq.getReadyAnswerIdx()};
 
         return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);

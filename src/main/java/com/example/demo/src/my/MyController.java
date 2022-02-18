@@ -153,8 +153,6 @@ public class MyController {
             if(!isRegexTextLengthSix(myPet.getPetName())){
                 return new BaseResponse<>(OVER_SIX_CHAR);
             }
-
-
             PatchMyPetReq patchMyPetReq = new PatchMyPetReq(petIdx, myPet.getPetImgUrl(), myPet.getPetName(), myPet.getPetType(), myPet.getPetBecomeFamilyDay());
             myService.modifyMyPet(patchMyPetReq);
 
@@ -169,7 +167,7 @@ public class MyController {
 
     /**
      * 동물 프로필 삭제 API
-     * [GET] /myPages/petInfo/:userIdx/:petIdx/status
+     * [PATCH] /myPages/petInfo/:userIdx/:petIdx/status
      * @return BaseResponse<String>
      */
     @ResponseBody

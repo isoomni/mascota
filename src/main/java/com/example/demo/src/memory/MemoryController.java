@@ -76,21 +76,9 @@ public class MemoryController {
             if(userIdx != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
-            if (order == null){ // 필터 적용이 하나도 없으면 다음과 같이
-                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
-                return new BaseResponse<>(getAnsweredMemoryRes);
-            }
-            if (order == "latest") {
-                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
-                return new BaseResponse<>(getAnsweredMemoryRes);
-            }
-            if (order == "oldest"){
-                List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
-                return new BaseResponse<>(getAnsweredMemoryRes);
-            }
-            else {return new BaseResponse<>(UNVALID_FILTER);}// 필터 적용 불가
 
-
+            List<GetAnsweredMemoryRes> getAnsweredMemoryRes = memoryProvider.getAnsweredMemory(petIdx, order);
+            return new BaseResponse<>(getAnsweredMemoryRes);
         }  catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -126,11 +114,11 @@ public class MemoryController {
 
     /**
      * 추억하기 개별 답변 작성 API
-     * [PATCH] /memories/one/:userIdx/:petIdx/:memoryQuestionIdx
+     * [POST] /memories/one/answer/:userIdx/:petIdx/:memoryQuestionIdx
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/one/{userIdx}/{petIdx}/{memoryQuestionIdx}")
+    @PostMapping("/one/answer/{userIdx}/{petIdx}/{memoryQuestionIdx}")
     public BaseResponse<String> createMemoryAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("petIdx") int petIdx,@PathVariable("memoryQuestionIdx") int memoryQuestionIdx, @RequestBody PostMemoryAnswer postMemoryAnswer){
         try {
             //jwt에서 idx 추출.
@@ -152,11 +140,11 @@ public class MemoryController {
 
     /**
      * 추억하기 개별 답변 수정 API
-     * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
+     * [PATCH] /memories/one/answer/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<String>
      */
     @ResponseBody
-    @PatchMapping("/one/{userIdx}/{memoryAnswerIdx}")
+    @PatchMapping("/one/answer/{userIdx}/{memoryAnswerIdx}")
     public BaseResponse<String> modifyMemoryAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("memoryAnswerIdx") int memoryAnswerIdx, @RequestBody PatchMemoryAnswer patchMemoryAnswer){
         try {
             //jwt에서 idx 추출.
