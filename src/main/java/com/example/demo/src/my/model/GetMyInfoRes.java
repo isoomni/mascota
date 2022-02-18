@@ -6,5 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetMyRes {
+public class GetMyInfoRes {
+    private String nickname;
+    private String userId;
 }
