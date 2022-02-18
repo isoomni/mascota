@@ -18,5 +18,5 @@
 | PATCH | /myPages/bookInfo/:userIdx | [책 표지 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
 | PATCH | /myPages/petInfo/:userIdx/:petIdx | [동물 프로필 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
 | PATCH | /myPages/petInfo/:userIdx/:petIdx/status | [동물 프로필 삭제](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
-| GET |  | [기록하기 일기 상세 조회]() || | 
-| GET |  | [캘린더 조회]() | |  | 
+| GET |  | 기록하기 일기 상세 조회 || | 
+| GET |  | 캘린더 조회 | |  | 
