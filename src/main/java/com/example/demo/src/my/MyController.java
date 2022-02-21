@@ -125,7 +125,7 @@ public class MyController {
     }
 
     /**
-     * 동물 프로필 수정
+     * 반려동물 프로필 수정
      * [PATCH] /myPages/petInfo/:userIdx/:petIdx
      * @return BaseResponse<String>
      * */

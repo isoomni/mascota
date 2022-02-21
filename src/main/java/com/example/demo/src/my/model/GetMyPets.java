@@ -12,5 +12,5 @@ public class GetMyPets {
     private String petImgUrl;
     private String petName;
     private String petType;
-    private Date petBecomeFamilyDay;
+    private String petBecomeFamilyDay;
 }

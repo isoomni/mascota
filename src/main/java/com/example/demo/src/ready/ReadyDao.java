@@ -84,16 +84,29 @@ public class ReadyDao {
         return this.jdbcTemplate.update(createUserQuery, createUserParams);
     }
 
+    /**checkAnswerExist*/
+    public int checkReadyAnswerExist(int petIdx, int questionIdx){
+        String Query = "select exists(select ra.rqIdx from ready_answer ra where petIdx = ? and rqIdx = ?)";
+        int Params1 = petIdx;
+        int Params2 = questionIdx;
+        return this.jdbcTemplate.queryForObject(Query,
+                int.class,
+                Params1, Params2);
+    }
+
+
+
+
     /**
      * 준비하기 개별 답변 수정 API
      * [PATCH] /readies/ones/:userIdx/:readyAnswerIdx
      * @return BaseResponse<String>
      */
     public int modifyReadyAnswer(PatchReadyAnswerReq patchReadyAnswerReq){
-        String modifyUserNameQuery = "update ready_answer set context = ? where idx = ? ";
-        Object[] modifyUserNameParams = new Object[]{patchReadyAnswerReq.getContext(), patchReadyAnswerReq.getReadyAnswerIdx()};
+        String Query = "update ready_answer ra set ra.context = ? where ra.idx = ? ";
+        Object[] Params = new Object[]{patchReadyAnswerReq.getContext(), patchReadyAnswerReq.getReadyAnswerIdx()};
 
-        return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
+        return this.jdbcTemplate.update(Query,Params);
     }
 
 }

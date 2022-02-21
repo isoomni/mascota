@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
-import static com.example.demo.config.BaseResponseStatus.MODIFY_FAIL;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
 public class MemoryService {
@@ -35,12 +34,27 @@ public class MemoryService {
      * @return BaseResponse<String>
      */
     public void createMemoryAnswer(PostMemoryAnswerReq postMemoryAnswerReq) throws BaseException {
+        // 존재하면 이미 존재한다는 메세지 출력
+        if(checkMemoryAnswerExist(postMemoryAnswerReq.getPetIdx(), postMemoryAnswerReq.getMemoryQuestionIdx()) == 1){ // true=1, 존재함
+            throw new BaseException(EXIST_ANSWER);
+        }
         try{
+
             int result = memoryDao.createMemoryAnswer(postMemoryAnswerReq);
             if(result == 0){
                 throw new BaseException(MODIFY_FAIL);
             }
         } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**checkAnswerExist*/
+    public int checkMemoryAnswerExist(int petIdx, int questionIdx) throws BaseException{
+        try {
+            return memoryDao.checkMemoryAnswerExist(petIdx, questionIdx);
+        }catch (Exception exception){
             exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }

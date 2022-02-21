@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PatchMemoryAnswerReq {
-    private int userIdx;
-    private int memoryAnswerIdx;
     private String context;
+    private int memoryAnswerIdx;
 }

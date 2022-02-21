@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
-import static com.example.demo.config.BaseResponseStatus.MODIFY_FAIL;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
 public class ReadyService {
@@ -34,6 +33,10 @@ public class ReadyService {
      * @return BaseResponse<String>
      */
     public void createReadyAnswer(PostReadyAnswerReq postReadyAnswerReq) throws BaseException {
+        // 존재하면 이미 존재한다는 메세지 출력
+        if(checkReadyAnswerExist(postReadyAnswerReq.getPetIdx(), postReadyAnswerReq.getReadyQuestionIdx()) == 1){ // true=1, 존재함
+            throw new BaseException(EXIST_ANSWER);
+        }
         try{
             int result = readyDao.createReadyAnswer(postReadyAnswerReq);
             if(result == 0){
@@ -44,7 +47,15 @@ public class ReadyService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
+    /**checkAnswerExist*/
+    public int checkReadyAnswerExist(int petIdx, int questionIdx) throws BaseException{
+        try {
+            return readyDao.checkReadyAnswerExist(petIdx, questionIdx);
+        }catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
     /**
      * 준비하기 개별 답변 수정 API
      * [PATCH] /readies/ones/:userIdx/:readyAnswerIdx

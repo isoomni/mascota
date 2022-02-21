@@ -3,9 +3,13 @@ package com.example.demo.src.memory;
 import com.example.demo.src.memory.model.*;
 import com.example.demo.src.ready.model.PatchReadyAnswerReq;
 import com.example.demo.src.ready.model.PostReadyAnswerReq;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -14,6 +18,7 @@ import java.util.List;
 public class MemoryDao {
     private JdbcTemplate jdbcTemplate;
 
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     public void setDataSource(DataSource dataSource){
@@ -156,18 +161,50 @@ public class MemoryDao {
         return this.jdbcTemplate.update(createUserQuery, createUserParams);
     }
 
+    /**checkAnswerExist*/
+    public int checkMemoryAnswerExist(int petIdx, int questionIdx){
+        String Query = "select exists(select ma.mqIdx from memory_answer ma where petIdx = ? and mqIdx = ?)";
+        int Params1 = petIdx;
+        int Params2 = questionIdx;
+        return this.jdbcTemplate.queryForObject(Query,
+                int.class,
+                Params1, Params2);
+    }
+
     /**
      * 추억하기 개별 답변 수정 API
      * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<String>
      */
     public int modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq){
-        String modifyUserNameQuery = "update memory_answer set context where idx = ? ";
-        Object[] modifyUserNameParams = new Object[]{patchMemoryAnswerReq.getContext(), patchMemoryAnswerReq.getMemoryAnswerIdx()};
+        String Query = "update memory_answer ma set ma.context = ? where ma.idx = ? ";
+        Object[] Params = new Object[]{patchMemoryAnswerReq.getContext(), patchMemoryAnswerReq.getMemoryAnswerIdx()};
 
-        return this.jdbcTemplate.update(modifyUserNameQuery,modifyUserNameParams);
+        return this.jdbcTemplate.update(Query,Params);
     }
 
+    /**
+     * 로그 테스트 API
+     * [GET] /test/log
+     * @return String
+     */
+    @ResponseBody
+    @GetMapping("/log")
+    public String getAll() {
+        System.out.println("테스트");
+//        trace, debug 레벨은 Console X, 파일 로깅 X
+//        logger.trace("TRACE Level 테스트");
+//        logger.debug("DEBUG Level 테스트");
 
+//        info 레벨은 Console 로깅 O, 파일 로깅 X
+        logger.info("INFO Level 테스트");
+//        warn 레벨은 Console 로깅 O, 파일 로깅 O
+        logger.warn("Warn Level 테스트");
+//        error 레벨은 Console 로깅 O, 파일 로깅 O (app.log 뿐만 아니라 error.log 에도 로깅 됨)
+//        app.log 와 error.log 는 날짜가 바뀌면 자동으로 *.gz 으로 압축 백업됨
+        logger.error("ERROR Level 테스트");
+
+        return "Success Test";
+    }
 
 }

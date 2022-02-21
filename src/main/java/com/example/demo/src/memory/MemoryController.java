@@ -127,7 +127,7 @@ public class MemoryController {
             if(userIdx != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
-            //같다면 유저네임 변경
+
             PostMemoryAnswerReq postMemoryAnswerReq = new PostMemoryAnswerReq(petIdx,memoryQuestionIdx, postMemoryAnswer.getContext());
             memoryService.createMemoryAnswer(postMemoryAnswerReq);
 
@@ -154,7 +154,7 @@ public class MemoryController {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
             //같다면 유저네임 변경
-            PatchMemoryAnswerReq patchMemoryAnswerReq = new PatchMemoryAnswerReq(userIdx,memoryAnswerIdx, patchMemoryAnswer.getContext());
+            PatchMemoryAnswerReq patchMemoryAnswerReq = new PatchMemoryAnswerReq(patchMemoryAnswer.getContext(), memoryAnswerIdx);
             memoryService.modifyMemoryAnswer(patchMemoryAnswerReq);
 
             String result = "";
