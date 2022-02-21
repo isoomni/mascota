@@ -43,7 +43,7 @@ public class ReadyProvider {
     }
 
     /**
-     * 준비하기 개별 질문 조회
+     * 준비하기 답변 조회
      * [GET] /ready/:userIdx/:petIdx
      * @return BaseResponse<List<GetOneReadyRes>>
      * */

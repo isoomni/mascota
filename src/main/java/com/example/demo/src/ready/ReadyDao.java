@@ -1,10 +1,8 @@
 package com.example.demo.src.ready;
 
 import com.example.demo.src.home.model.GetHomeRes;
-import com.example.demo.src.ready.model.GetOneReadyRes;
-import com.example.demo.src.ready.model.GetReadyRes;
-import com.example.demo.src.ready.model.PatchReadyAnswerReq;
-import com.example.demo.src.ready.model.PostReadyAnswerReq;
+import com.example.demo.src.memory.model.PatchMemoryAnswerStatusReq;
+import com.example.demo.src.ready.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -47,7 +45,7 @@ public class ReadyDao {
     }
 
     /**
-     * 준비하기 개별 질문 조회
+     * 준비하기 답변 조회
      * [GET] /ready/:userIdx/:readyAnswerIdx
      * @return BaseResponse<List<GetOneReadyRes>>
      * */
@@ -73,7 +71,7 @@ public class ReadyDao {
     }
 
     /**
-     * 준비하기 개별 답변 작성 API
+     * 준비하기 답변 작성 API
      * [PATCH] /readies/ones/:userIdx/:readyQuestionIdx
      * @return BaseResponse<String>
      */
@@ -95,10 +93,8 @@ public class ReadyDao {
     }
 
 
-
-
     /**
-     * 준비하기 개별 답변 수정 API
+     * 준비하기 답변 수정 API
      * [PATCH] /readies/ones/:userIdx/:readyAnswerIdx
      * @return BaseResponse<String>
      */
@@ -108,5 +104,20 @@ public class ReadyDao {
 
         return this.jdbcTemplate.update(Query,Params);
     }
+
+
+    /**
+     * 준비하기 답변 삭제 API
+     * [PATCH] /readies/one/answer/:userIdx/:readyAnswerIdx/status
+     * @return BaseResponse<String>
+     */
+    public int deleteReadyAnswer(PatchReadyAnswerStatusReq patchReadyAnswerStatusReq){
+        String modifyOrderQuery = "UPDATE ready_answer set status = ? where idx = ?;";
+        Object[] modifyOrderParams = new Object[]{patchReadyAnswerStatusReq.getStatus(), patchReadyAnswerStatusReq.getReadyAnswerIdx()};
+
+        return this.jdbcTemplate.update(modifyOrderQuery,modifyOrderParams);
+    }
+
+
 
 }

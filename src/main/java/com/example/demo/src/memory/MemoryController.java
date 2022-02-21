@@ -85,11 +85,9 @@ public class MemoryController {
     }
 
 
-
-
     /**
-     * 추억하기 개별 질문 조회
-     * [GET] /memories/one/:userIdx/:readyAnswerIdx
+     * 추억하기 답변 조회
+     * [GET] /memories/one/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<List<GetOneMemoryRes>>
      * */
     @ResponseBody
@@ -113,7 +111,7 @@ public class MemoryController {
     }
 
     /**
-     * 추억하기 개별 답변 작성 API
+     * 추억하기 답변 작성 API
      * [POST] /memories/one/answer/:userIdx/:petIdx/:memoryQuestionIdx
      * @return BaseResponse<String>
      */
@@ -139,7 +137,7 @@ public class MemoryController {
     }
 
     /**
-     * 추억하기 개별 답변 수정 API
+     * 추억하기 답변 수정 API
      * [PATCH] /memories/one/answer/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<String>
      */
@@ -156,6 +154,32 @@ public class MemoryController {
             //같다면 유저네임 변경
             PatchMemoryAnswerReq patchMemoryAnswerReq = new PatchMemoryAnswerReq(patchMemoryAnswer.getContext(), memoryAnswerIdx);
             memoryService.modifyMemoryAnswer(patchMemoryAnswerReq);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 추억하기 답변 삭제 API
+     * [PATCH] /memories/one/answer/:userIdx/:memoryAnswerIdx/status
+     * @return BaseResponse<String>
+     */
+    @ResponseBody
+    @PatchMapping("/one/answer/{userIdx}/{memoryAnswerIdx}/status")
+    public BaseResponse<String> deleteMemoryAnswer(@PathVariable("userIdx") int userIdx,@PathVariable("memoryAnswerIdx") int memoryAnswerIdx, @RequestBody MemoryAnswerStatus MemoryAnswerStatus){
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }  // 이 부분까지는 유저가 사용하는 기능 중 유저에 대한 보안이 철저히 필요한 api 에서 사용
+            //같다면 유저네임 변경
+            PatchMemoryAnswerStatusReq patchMemoryAnswerStatusReq = new PatchMemoryAnswerStatusReq(memoryAnswerIdx, MemoryAnswerStatus.getStatus());
+            memoryService.deleteMemoryAnswer(patchMemoryAnswerStatusReq);
 
             String result = "";
             return new BaseResponse<>(result);

@@ -3,7 +3,9 @@ package com.example.demo.src.memory;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.memory.model.PatchMemoryAnswerReq;
+import com.example.demo.src.memory.model.PatchMemoryAnswerStatusReq;
 import com.example.demo.src.memory.model.PostMemoryAnswerReq;
+import com.example.demo.src.my.model.PatchPetStatusReq;
 import com.example.demo.src.ready.model.PatchReadyAnswerReq;
 import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import org.slf4j.Logger;
@@ -29,8 +31,8 @@ public class MemoryService {
     }
 
     /**
-     * 추억하기 개별 답변 작성 API
-     * [PATCH] /memories/one/:userIdx/:petIdx/:memoryQuestionIdx
+     * 추억하기 답변 작성 API
+     * [POST] /memories/one/answer/:userIdx/:petIdx/:memoryQuestionIdx
      * @return BaseResponse<String>
      */
     public void createMemoryAnswer(PostMemoryAnswerReq postMemoryAnswerReq) throws BaseException {
@@ -61,8 +63,8 @@ public class MemoryService {
     }
 
     /**
-     * 추억하기 개별 답변 수정 API
-     * [PATCH] /memories/one/:userIdx/:memoryAnswerIdx
+     * 추억하기 답변 수정 API
+     * [PATCH] /memories/one/answer/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<String>
      */
     public void modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq) throws BaseException {
@@ -77,6 +79,24 @@ public class MemoryService {
         }
     }
 
+    /**
+     * 추억하기 답변 삭제 API
+     * [PATCH] /memories/one/answer/:userIdx/:memoryAnswerIdx/status
+     * @return BaseResponse<String>
+     */
+    public void deleteMemoryAnswer(PatchMemoryAnswerStatusReq patchMemoryAnswerStatusReq) throws BaseException {
+        // memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
+        // status가 N일 때, 이미 삭제된 답변입니다. 예외처리 필요
+        try{
+            int result = memoryDao.deleteMemoryAnswer(patchMemoryAnswerStatusReq);
+            if (result == 0){
+                throw new BaseException(FAIL_DELETE_PET);
+            }
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

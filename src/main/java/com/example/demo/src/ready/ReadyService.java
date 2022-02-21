@@ -3,7 +3,9 @@ package com.example.demo.src.ready;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.home.HomeDao;
 import com.example.demo.src.home.HomeProvider;
+import com.example.demo.src.memory.model.PatchMemoryAnswerStatusReq;
 import com.example.demo.src.ready.model.PatchReadyAnswerReq;
+import com.example.demo.src.ready.model.PatchReadyAnswerStatusReq;
 import com.example.demo.src.ready.model.PostReadyAnswerReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,7 @@ public class ReadyService {
     }
 
     /**
-     * 준비하기 개별 답변 작성 API
+     * 준비하기 답변 작성 API
      * [PATCH] /readies/ones/:userIdx/:readyQuestionIdx
      * @return BaseResponse<String>
      */
@@ -57,7 +59,7 @@ public class ReadyService {
         }
     }
     /**
-     * 준비하기 개별 답변 수정 API
+     * 준비하기 답변 수정 API
      * [PATCH] /readies/ones/:userIdx/:readyAnswerIdx
      * @return BaseResponse<String>
      */
@@ -66,6 +68,23 @@ public class ReadyService {
             int result = readyDao.modifyReadyAnswer(patchReadyAnswerReq);
             if(result == 0){
                 throw new BaseException(MODIFY_FAIL);
+            }
+        } catch(Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 준비하기 답변 삭제 API
+     * [PATCH] /readies/one/answer/:userIdx/:readyAnswerIdx/status
+     * @return BaseResponse<String>
+     */
+    public void deleteReadyAnswer(PatchReadyAnswerStatusReq patchReadyAnswerStatusReq) throws BaseException {
+        try{
+            int result = readyDao.deleteReadyAnswer(patchReadyAnswerStatusReq);
+            if (result == 0){
+                throw new BaseException(FAIL_DELETE_PET);
             }
         } catch(Exception exception){
             exception.printStackTrace();

@@ -29,7 +29,7 @@ public class MemoryProvider {
 
     /**
      * 추억하기 전체 질문 조회 (답변하기 탭)
-     * [GET] /ready/:userIdx/:petIdx
+     * [GET] /memories/all/notAnsweredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetNotAnsweredMemoryRes>>
      * */
     public List<GetNotAnsweredMemoryRes> getNotAnsweredMemory(int userIdx, int petIdx) throws BaseException {
@@ -46,7 +46,7 @@ public class MemoryProvider {
 
     /**
      * 추억하기 전체 질문 조회 (모아보기 탭) (질문인덱스순, 최신순, 오래된순)
-     * [GET] /ready/:userIdx/:petIdx
+     * [GET] /memories/all/answeredMemories/:userIdx/:petIdx
      * @return BaseResponse<List<GetAnsweredMemoryRes>>
      * */
     // 질문인덱스순
@@ -63,8 +63,8 @@ public class MemoryProvider {
 
 
     /**
-     * 추억하기 개별 질문 조회
-     * [GET] /ready/:userIdx/:readyAnswerIdx
+     * 추억하기 답변 조회
+     * [GET] /memories/one/:userIdx/:memoryAnswerIdx
      * @return BaseResponse<List<GetOneMemoryRes>>
      * */
     public List<GetOneMemoryRes> getOneMemory(int userIdx, int memoryAnswerIdx) throws BaseException {
