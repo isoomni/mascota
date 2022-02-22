@@ -92,6 +92,34 @@ public class MyDao {
                         ),Params);
     }
 
+    /**
+     * 마이페이지 비밀번호 가져오기 FOR CHECK
+     * */
+    public UserPassword getPwd (PatchMyPasswordReq patchMyPasswordReq){
+        String Query = "select u.idx, u.password from user u where idx = ?";
+        int Params = patchMyPasswordReq.getUserIdx();
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rowNum)-> new UserPassword(
+                        rs.getInt("idx"),
+                        rs.getString("password")
+                ),
+                Params
+        );
+    }
+    /**
+     * 마이페이지 비밀번호 변경
+     * [PATCH] /myPages/myInfo/password/:userIdx
+     * @return BaseResponse<String>
+     * */
+    public int modifyPassword(PatchMyPasswordReq patchMyPasswordReq){
+        String createUserQuery = "update user set password = ? where idx = ?;";
+        Object[] createUserParams = new Object[]{patchMyPasswordReq.getNewPassword(), patchMyPasswordReq.getUserIdx()};
+
+        return this.jdbcTemplate.update(createUserQuery, createUserParams);
+    }
+
+
 
     /**
      * 책 표지 수정

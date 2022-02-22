@@ -1,9 +1,9 @@
 package com.example.demo.src.my;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.my.model.PatchMyBookReq;
-import com.example.demo.src.my.model.PatchMyPetReq;
-import com.example.demo.src.my.model.PatchPetStatusReq;
+import com.example.demo.config.secret.Secret;
+import com.example.demo.src.my.model.*;
+import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,53 @@ public class MyService {
     private final MyDao myDao;
     @Autowired
     private final MyProvider myProvider;
+    @Autowired
+    private final JwtService jwtService;
 
-    public MyService(MyDao myDao, MyProvider myProvider){
+    public MyService(MyDao myDao, MyProvider myProvider, JwtService jwtService){
         this.myDao = myDao;
         this.myProvider = myProvider;
+        this.jwtService = jwtService;
     }
+
+    /**
+     * 마이페이지 비밀번호 변경
+     * [PATCH] /myPages/myInfo/password/:userIdx
+     * @return BaseResponse<String>
+     * */
+    public void modifyPassword(PatchMyPasswordReq patchMyPasswordReq) throws BaseException{
+        // old password 가지고 비밀번호 인증
+        UserPassword userPassword = myDao.getPwd(patchMyPasswordReq);
+        String password;
+        try {
+            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(userPassword.getPassword());
+        } catch (Exception ignored) {
+            throw new BaseException(PASSWORD_DECRYPTION_ERROR);
+        }
+        if(!patchMyPasswordReq.getOldPassword().equals(password)){
+            throw new BaseException(PASSWORD_ERROR); // 비밀번호 인증에 실패하였습니다.
+        }
+        // 새로운 비밀번호 가지고 비밀번호 변경
+        String pwd;
+        try {
+            //암호화
+            pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(patchMyPasswordReq.getNewPassword());
+            patchMyPasswordReq.setNewPassword(pwd);
+        } catch (Exception ignored) {
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
+        }
+        try {
+            int result = myDao.modifyPassword(patchMyPasswordReq);
+            if(result == 0){
+                throw new BaseException(PASSWORD_MODIFY_ERROR);
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
 
     /**
      * 책 표지 수정
@@ -75,6 +117,8 @@ public class MyService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+
 
 
     /**

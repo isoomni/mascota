@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.utils.ValidationRegex.isRegexTextLengthSix;
-import static com.example.demo.utils.ValidationRegex.isRegexTextLengthTwelve;
+import static com.example.demo.utils.ValidationRegex.*;
+
 
 @RestController
 @RequestMapping("/myPages")
@@ -80,6 +80,50 @@ public class MyController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 마이페이지 비밀번호 변경
+     * [PATCH] /myPages/myInfo/password/:userIdx
+     * @return BaseResponse<String>
+     * */
+    @ResponseBody
+    @PatchMapping("/myInfo/password/{userIdx}")
+    public BaseResponse<String> modifyPassword(@PathVariable("userIdx") int userIdx, @RequestBody MyPassword myPassword){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            if(myPassword.getOldPassword() == null){
+                return new BaseResponse<>(EMPTY_USER_OLD_PASSWORD); // 현재 비밀번호
+            }
+            if(myPassword.getNewPassword() == null){
+                return new BaseResponse<>(EMPTY_USER_NEW_PASSWORD);  // 신규 비밀번호
+            }
+            //비밀번호 정규표현
+            if (!isRegexPassword(myPassword.getNewPassword())){  // 특수문자 / 문자 / 숫자 포함 형태의 8~20자리 이내의 암호 정규식
+                return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
+            }
+            if(myPassword.getReNewPassword() == null){
+                return new BaseResponse<>(EMPTY_USER_NEW_PASSWORD);  // 신규 비밀번호 재확인
+            }
+            if(!myPassword.getNewPassword().equals(myPassword.getReNewPassword())){
+                return new BaseResponse<>(REENTER_PASSWORD_IS_DIFFERENT); // 재확인 비밀번호가 일치하지 않습니다.
+            }
+
+            PatchMyPasswordReq patchMyPasswordReq = new PatchMyPasswordReq(userIdx, myPassword.getOldPassword(), myPassword.getNewPassword(), myPassword.getReNewPassword());
+            myService.modifyPassword(patchMyPasswordReq);
+
+            String result = "";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
 
     /**
      * 책 표지 수정

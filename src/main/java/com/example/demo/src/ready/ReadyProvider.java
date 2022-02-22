@@ -48,6 +48,7 @@ public class ReadyProvider {
      * @return BaseResponse<List<GetOneReadyRes>>
      * */
     public List<GetOneReadyRes> getOneReady(int userIdx, int readyAnswerIdx) throws BaseException {
+
         try{
             List<GetOneReadyRes> getOneReadyRes = readyDao.getOneReady(userIdx, readyAnswerIdx);
             return getOneReadyRes;

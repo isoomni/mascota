@@ -25,14 +25,16 @@ public class MemoryDao {
      * @return BaseResponse<List<GetNotAnsweredMemoryRes>>
      * */
     public List<GetNotAnsweredMemoryRes> getNotAnsweredMemory(int userIdx, int petIdx){
-        String Query = "SELECT mq.idx as questionNum, " +
-                "REPLACE(mq.context, '*', (SELECT p.name FROM pet p WHERE p.idx = ?)) as question,\n" +
-                "       (SELECT ma.context FROM memory_answer ma " +
-                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx) as answer\n" +
+        String Query = "SELECT mq.idx as questionNum, REPLACE(mq.context, '*', " +
+                "(SELECT p.name FROM pet p WHERE p.idx = ? )) as question,\n" +
+                "       case ma.context\n" +
+                "        when (SELECT ma.context FROM memory_answer ma " +
+                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx ) then '답변을 입력하세요'\n" +
+                "           else '답변을 입력하세요' end as answer\n" +
                 "FROM memory_question mq\n" +
                 "LEFT JOIN memory_answer ma on mq.idx = ma.mqIdx\n" +
                 "where (SELECT ma.context FROM memory_answer ma " +
-                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx) is null;";
+                "WHERE ma.petIdx = ? AND mq.idx = ma.mqIdx) is null or ma.status = 'N';";
 
         int Params = petIdx;
 
@@ -60,7 +62,7 @@ public class MemoryDao {
                 "FROM pet p\n" +
                 "    LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
                 "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.petIdx = ?\n" +
+                "WHERE ma.petIdx = ? and ma.status = 'Y'\n" +
                 "ORDER BY questionNum;";
         // 최신순
         String Query2 = "SELECT mq.idx AS questionNum,\n" +
@@ -70,7 +72,7 @@ public class MemoryDao {
                 "FROM pet p\n" +
                 "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
                 "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.petIdx = ?\n" +
+                "WHERE ma.petIdx = ? and ma.status = 'Y'\n" +
                 "ORDER BY ma.updatedAt DESC;";
 
         // 오래된 순
@@ -81,7 +83,7 @@ public class MemoryDao {
                 "FROM pet p\n" +
                 "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
                 "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.petIdx = ?\n" +
+                "WHERE ma.petIdx = ? and ma.status = 'Y'\n" +
                 "ORDER BY ma.updatedAt ASC;";
 
         int Params = petIdx;
@@ -129,7 +131,7 @@ public class MemoryDao {
                 "FROM pet p\n" +
                 "         LEFT JOIN memory_answer ma on p.idx = ma.petIdx\n" +
                 "         LEFT JOIN memory_question mq on mq.idx = ma.mqIdx\n" +
-                "WHERE ma.idx = ? and ma.mqIdx = mq.idx and ma.context IS NOT NULL;";
+                "WHERE ma.idx = ? and ma.mqIdx = mq.idx and ma.context IS NOT NULL and ma.status = 'Y';";
 
         int Params = memoryAnswerIdx;
 
@@ -170,7 +172,7 @@ public class MemoryDao {
      * @return BaseResponse<String>
      */
     public int modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq){
-        String Query = "update memory_answer ma set ma.context = ? where ma.idx = ? ";
+        String Query = "update memory_answer ma set ma.context = ? where ma.idx = ? and status = 'Y'";
         Object[] Params = new Object[]{patchMemoryAnswerReq.getContext(), patchMemoryAnswerReq.getMemoryAnswerIdx()};
 
         return this.jdbcTemplate.update(Query,Params);
@@ -183,13 +185,33 @@ public class MemoryDao {
      * @return BaseResponse<String>
      */
     public int deleteMemoryAnswer(PatchMemoryAnswerStatusReq patchMemoryAnswerStatusReq){
-        String modifyOrderQuery = "UPDATE memory_answer set status = ? where idx = ?;";
+        String modifyOrderQuery = "UPDATE memory_answer set status = ? where idx = ? and status = 'Y';";
         Object[] modifyOrderParams = new Object[]{patchMemoryAnswerStatusReq.getStatus(), patchMemoryAnswerStatusReq.getMemoryAnswerIdx()};
 
         return this.jdbcTemplate.update(modifyOrderQuery,modifyOrderParams);
     }
-
-
+    /**checkNotExist
+     * memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리
+     */
+    public int checkMANotExist(int memoryAnswerIdx){
+        String checkQuery = "select exists(select idx from memory_answer where idx = ?)";
+        int checkParams = memoryAnswerIdx;
+        return this.jdbcTemplate.queryForObject(checkQuery,
+                int.class,
+                checkParams);
+    }
+    /**checkMAAlreadyDelete
+     * status가 N일 때, 이미 삭제된 답변입니다.*/
+    public int checkMAAlreadyDelete(int memoryAnswerIdx){
+        String checkQuery = "select (case status when 'N' THEN 0\n" +
+                "                    when 'Y' then 1\n" +
+                "    end) as 'checkStatus'\n" +
+                "    from memory_answer where idx = ?;";
+        int checkParams = memoryAnswerIdx;
+        return this.jdbcTemplate.queryForObject(checkQuery,
+                int.class,
+                checkParams);
+    }
 
 
 }

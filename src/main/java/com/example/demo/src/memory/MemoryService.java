@@ -68,6 +68,12 @@ public class MemoryService {
      * @return BaseResponse<String>
      */
     public void modifyMemoryAnswer(PatchMemoryAnswerReq patchMemoryAnswerReq) throws BaseException {
+        if (checkMANotExist(patchMemoryAnswerReq.getMemoryAnswerIdx())==0){ // memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
+            throw new BaseException(IDX_NOT_EXIST);
+        }
+        if (checkMAAlreadyDelete(patchMemoryAnswerReq.getMemoryAnswerIdx()) == 0){ // status가 N일 때, 이미 삭제된 답변입니다.
+            throw new BaseException(ALREADY_DELETE_ANSWER);
+        }
         try{
             int result = memoryDao.modifyMemoryAnswer(patchMemoryAnswerReq);
             if(result == 0){
@@ -85,8 +91,13 @@ public class MemoryService {
      * @return BaseResponse<String>
      */
     public void deleteMemoryAnswer(PatchMemoryAnswerStatusReq patchMemoryAnswerStatusReq) throws BaseException {
-        // memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
-        // status가 N일 때, 이미 삭제된 답변입니다. 예외처리 필요
+
+        if (checkMANotExist(patchMemoryAnswerStatusReq.getMemoryAnswerIdx())==0){ // memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
+            throw new BaseException(IDX_NOT_EXIST);
+        }
+        if (checkMAAlreadyDelete(patchMemoryAnswerStatusReq.getMemoryAnswerIdx()) == 0){ // status가 N일 때, 이미 삭제된 답변입니다.
+            throw new BaseException(ALREADY_DELETE_ANSWER);
+        }
         try{
             int result = memoryDao.deleteMemoryAnswer(patchMemoryAnswerStatusReq);
             if (result == 0){
@@ -98,6 +109,28 @@ public class MemoryService {
         }
     }
 
+    /**checkMANotExist
+     * memoryAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리
+     */
+    public int checkMANotExist(int memoryAnswerIdx) throws BaseException{
+        try{
+            return memoryDao.checkMANotExist(memoryAnswerIdx);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**checkMAAlreadyDelete
+     * status가 N일 때, 이미 삭제된 답변입니다.*/
+    public int checkMAAlreadyDelete(int memoryAnswerIdx) throws BaseException{
+        try{
+            return memoryDao.checkMAAlreadyDelete(memoryAnswerIdx);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

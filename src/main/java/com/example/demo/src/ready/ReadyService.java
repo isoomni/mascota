@@ -64,6 +64,12 @@ public class ReadyService {
      * @return BaseResponse<String>
      */
     public void modifyReadyAnswer(PatchReadyAnswerReq patchReadyAnswerReq) throws BaseException {
+        if (checkRANotExist(patchReadyAnswerReq.getReadyAnswerIdx())==0){ // readyAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
+            throw new BaseException(IDX_NOT_EXIST);
+        }
+        if (checkRAAlreadyDelete(patchReadyAnswerReq.getReadyAnswerIdx()) == 0){ // status가 N일 때, 이미 삭제된 답변입니다.
+            throw new BaseException(ALREADY_DELETE_ANSWER);
+        }
         try{
             int result = readyDao.modifyReadyAnswer(patchReadyAnswerReq);
             if(result == 0){
@@ -81,6 +87,12 @@ public class ReadyService {
      * @return BaseResponse<String>
      */
     public void deleteReadyAnswer(PatchReadyAnswerStatusReq patchReadyAnswerStatusReq) throws BaseException {
+        if (checkRANotExist(patchReadyAnswerStatusReq.getReadyAnswerIdx())==0){ // readyAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리 필요
+            throw new BaseException(IDX_NOT_EXIST);
+        }
+        if (checkRAAlreadyDelete(patchReadyAnswerStatusReq.getReadyAnswerIdx()) == 0){ // status가 N일 때, 이미 삭제된 답변입니다.
+            throw new BaseException(ALREADY_DELETE_ANSWER);
+        }
         try{
             int result = readyDao.deleteReadyAnswer(patchReadyAnswerStatusReq);
             if (result == 0){
@@ -92,7 +104,28 @@ public class ReadyService {
         }
     }
 
+    /**checkRANotExist
+     * readyAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리
+     */
+    public int checkRANotExist(int readyAnswerIdx) throws BaseException{
+        try{
+            return readyDao.checkRANotExist(readyAnswerIdx);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
+    /**checkRAAlreadyDelete
+     * status가 N일 때, 이미 삭제된 답변입니다.*/
+    public int checkRAAlreadyDelete(int readyAnswerIdx) throws BaseException{
+        try{
+            return readyDao.checkRAAlreadyDelete(readyAnswerIdx);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
     /**
      * 로그 테스트 API

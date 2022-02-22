@@ -56,7 +56,7 @@ public class ReadyDao {
                 "FROM ready_question rq\n" +
                 "         LEFT JOIN ready_answer ra on rq.idx = ra.rqIdx\n" +
                 "LEFT JOIN pet p on ra.petIdx = p.idx\n" +
-                "WHERE ra.idx = ?;";
+                "WHERE ra.idx = ? AND ra.status = 'Y';";
 
 
         int getReadyParams2 = readyAnswerIdx;
@@ -99,7 +99,7 @@ public class ReadyDao {
      * @return BaseResponse<String>
      */
     public int modifyReadyAnswer(PatchReadyAnswerReq patchReadyAnswerReq){
-        String Query = "update ready_answer ra set ra.context = ? where ra.idx = ? ";
+        String Query = "update ready_answer ra set ra.context = ? where ra.idx = ? and ra.status = 'Y'";
         Object[] Params = new Object[]{patchReadyAnswerReq.getContext(), patchReadyAnswerReq.getReadyAnswerIdx()};
 
         return this.jdbcTemplate.update(Query,Params);
@@ -112,12 +112,33 @@ public class ReadyDao {
      * @return BaseResponse<String>
      */
     public int deleteReadyAnswer(PatchReadyAnswerStatusReq patchReadyAnswerStatusReq){
-        String modifyOrderQuery = "UPDATE ready_answer set status = ? where idx = ?;";
+        String modifyOrderQuery = "UPDATE ready_answer ra set status = ? where idx = ? and ra.status = 'Y';";
         Object[] modifyOrderParams = new Object[]{patchReadyAnswerStatusReq.getStatus(), patchReadyAnswerStatusReq.getReadyAnswerIdx()};
 
         return this.jdbcTemplate.update(modifyOrderQuery,modifyOrderParams);
     }
+    /**checkRANotExist
+     * readyAnswerIdx가 데이터베이스에 존재하지 않을 때 예외처리
+     */
+    public int checkRANotExist(int readyAnswerIdx){
+        String checkQuery = "select exists(select idx from ready_answer where idx = ?)";
+        int checkParams = readyAnswerIdx;
+        return this.jdbcTemplate.queryForObject(checkQuery,
+                int.class,
+                checkParams);
 
-
+    }
+    /**checkRAAlreadyDelete
+     * status가 N일 때, 이미 삭제된 답변입니다.*/
+    public int checkRAAlreadyDelete(int readyAnswerIdx){
+        String checkQuery = "select (case status when 'N' THEN 0\n" +
+                "                    when 'Y' then 1\n" +
+                "    end) as 'checkStatus'\n" +
+                "    from ready_answer where idx = ?;";
+        int checkParams = readyAnswerIdx;
+        return this.jdbcTemplate.queryForObject(checkQuery,
+                int.class,
+                checkParams);
+    }
 
 }
