@@ -182,13 +182,28 @@ public class DiaryController {
     public BaseResponse<HelpHome> getDiaryHelp() {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
-
             HelpHome result = diaryProvider.getDiaryHelp(userIdxByJwt);
-
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    @ResponseBody
+    @GetMapping("/miss")
+    public BaseResponse<Miss> getDiaryHelp(@RequestParam(required = true) String name) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (name.length() == 0){
+                return new BaseResponse<>(NONE_NAME_EXIST);
+            }
+            Miss result = diaryProvider.getMiss(userIdxByJwt,name);
+            return new BaseResponse<>(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    
 
 }

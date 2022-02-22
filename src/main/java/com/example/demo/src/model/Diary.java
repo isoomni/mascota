@@ -42,10 +42,10 @@ public class Diary {
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY,  cascade = CascadeType.ALL)
     Set<DiaryImg> imgurls = new HashSet<>();
 
-    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="diary", fetch = FetchType.LAZY,  cascade = CascadeType.ALL)
     Set<Mood> moods = new HashSet<>();
 
     public void setByDiaryDto(DiaryDto diaryDto){

@@ -25,7 +25,7 @@ public class Help {
     private String source;
 
     @Column(length = 45, nullable = false)
-    private String helptitle;
+    private String title;
 
     @Column(length = 2000, nullable = false)
     private String helpurl;

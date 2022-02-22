@@ -2,13 +2,17 @@ package com.example.demo.src.diary;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
+
 import com.example.demo.src.model.*;
+import com.example.demo.src.repository.*;
+import com.example.demo.src.specification.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.*;
 
 import javax.sql.DataSource;
@@ -132,7 +136,9 @@ public class DiaryService {
 
     public void deleteDiary(Integer diaryIdx, Integer userIdx) throws BaseException {
         try{
-            Optional<Diary> chk = diaryRepository.selectById(diaryIdx);
+
+            Specification<Diary> spec = Specification.where(DiarySpecification.chkMyDiary(diaryIdx));
+            Optional<Diary> chk = diaryRepository.findOne(spec);
             if (chk.isPresent()){
                 Diary result = chk.get();
                 User s = result.getUser();
@@ -145,6 +151,9 @@ public class DiaryService {
                 throw new BaseException(NONE_DIARY_EXIST);
             }
         } catch (Exception exception) {
+            if (exception instanceof BaseException){
+                throw (BaseException)exception;
+            }
             throw new BaseException(DATABASE_ERROR);
         }
     }

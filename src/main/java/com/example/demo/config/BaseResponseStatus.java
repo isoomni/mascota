@@ -61,6 +61,8 @@ public enum BaseResponseStatus {
     NONE_DIARY_WRITE(false,2045,"해당 다이어리의 작성자가 아닙니다."),
     NONE_TYPED(false,2046,"타입 형식을 올바르게 입력해주세요."),
     NONE_PAGE(false,2047,"해당 페이지는 존재하지 않습니다."),
+    ALREADY_PET_EXIST(false,2048,"중복된 반려동물 이름입니다."),
+    NONE_PETS_EXIST(false,2049,"존재하지 않는 반려동물입니다."),
 
     /**
      * 3000 : Response 오류

@@ -7,19 +7,24 @@ spring:
 
   datasource:
     platform: mysql
-    url: jdbc:mysql://mascotadatabase.cuzuaf4gn010.ap-northeast-2.rds.amazonaws.com/mascota?autoReconnect=true # 변경해주세요
+    url: jdbc:mysql://mascotadatabase.cuzuaf4gn010.ap-northeast-2.rds.amazonaws.com/mascota?rewriteBatchedStatements=true&autoReconnect=true # 변경해주세요
     username: mascota  # 변경해주세요
     password: z1z2z3z4! # 변경해주세요
     driver-class-name: com.mysql.cj.jdbc.Driver # mysql 8버전
     # driver-class-name: com.mysql.jdbc.Driver # mysql 5버전
 
   jpa:
+    database: mysql
     properties:
       hibernate:
+        order_inserts: true
+        order_updates: true
         ddl-auto: validate
         show_sql: true
         format_sql: true
         use_sql_comments: true
+        jdbc:
+          batch_size: 10
   logging:
     level:
       org:
