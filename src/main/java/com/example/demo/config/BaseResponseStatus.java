@@ -61,7 +61,9 @@ public enum BaseResponseStatus {
     NONE_DIARY_WRITE(false,2045,"해당 다이어리의 작성자가 아닙니다."),
     NONE_TYPED(false,2046,"타입 형식을 올바르게 입력해주세요."),
     NONE_PAGE(false,2047,"해당 페이지는 존재하지 않습니다."),
-    UNVALID_FILTER(false, 2048, "해당하는 필터가 없습니다."),
+    ALREADY_PET_EXIST(false,2048,"중복된 반려동물 이름입니다."),
+    NONE_PETS_EXIST(false,2049,"존재하지 않는 반려동물입니다."),
+    UNVALID_FILTER(false, 2050, "해당하는 필터가 없습니다."),
 
     MODIFY_FAIL(false, 2070, "준비하기 답변 수정에 실패했습니다."),
     EMPTY_BOOK_TITLE(false, 2071, "책 제목을 입력해주세요"),
@@ -103,8 +105,8 @@ public enum BaseResponseStatus {
      * 4000 : Database, Server 오류
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
-    DATABASE_EXIST_ERROR(false, 4000, "데이터베이스에 존재하는지 여부 연결에 실패하였습니다."),
-    SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
+    DATABASE_EXIST_ERROR(false, 4001, "데이터베이스에 존재하는지 여부 연결에 실패하였습니다."),
+    SERVER_ERROR(false, 4002, "서버와의 연결에 실패하였습니다."),
 
     //[PATCH] /users/{userIdx}
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
