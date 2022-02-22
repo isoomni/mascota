@@ -200,7 +200,7 @@ public class UserController {
                 return new BaseResponse<>(NONE_USER_EXIST);
             }
 
-            PetDto result = userService.updatePet(pet, petIdx);
+            PetDto result = userService.updatePet(pet, petIdx, userIdxByJwt);
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

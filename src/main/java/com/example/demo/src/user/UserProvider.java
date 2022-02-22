@@ -3,6 +3,8 @@ package com.example.demo.src.user;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
 import com.example.demo.src.model.*;
+import com.example.demo.src.repository.*;
+import com.example.demo.src.specification.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -92,7 +95,7 @@ public class UserProvider {
         try{
             List<PetDto> result = new ArrayList<>();
             User user = new User(userIdx);
-            List<Pet> cur = petRepository.findByUser(user);
+            List<Pet> cur = petRepository.findByUserAndStatus(user,"N");
             cur.forEach(p -> {
                 result.add(new PetDto(p));
             });
