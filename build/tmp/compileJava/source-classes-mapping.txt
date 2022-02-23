@@ -1,15 +1,5 @@
 com/example/demo/src/home/model/GetHomeNicknameRes.java
  com.example.demo.src.home.model.GetHomeNicknameRes
-<<<<<<< HEAD
-com/example/demo/config/Constant.java
- com.example.demo.config.Constant
-com/example/demo/src/model/MoodDto.java
- com.example.demo.src.model.MoodDto
-com/example/demo/utils/ValidationRegex.java
- com.example.demo.utils.ValidationRegex
-com/example/demo/src/repository/DiaryRepository.java
- com.example.demo.src.repository.DiaryRepository
-=======
 com/example/demo/src/my/model/PatchPetStatusReq.java
  com.example.demo.src.my.model.PatchPetStatusReq
 com/example/demo/src/memory/model/PatchMemoryAnswer.java
@@ -18,7 +8,6 @@ com/example/demo/src/repository/DiaryRepository.java
  com.example.demo.src.repository.DiaryRepository
 com/example/demo/src/ready/ReadyDao.java
  com.example.demo.src.ready.ReadyDao
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
 com/example/demo/src/model/DiaryListDto.java
  com.example.demo.src.model.DiaryListDto
 com/example/demo/src/model/User.java
@@ -140,13 +129,8 @@ com/example/demo/config/secret/Secret.java
  com.example.demo.config.secret.Secret
 com/example/demo/config/BaseResponse.java
  com.example.demo.config.BaseResponse
-<<<<<<< HEAD
-com/example/demo/src/repository/PetRepository.java
- com.example.demo.src.repository.PetRepository
-=======
 com/example/demo/src/memory/model/GetAnsweredMemoryRes.java
  com.example.demo.src.memory.model.GetAnsweredMemoryRes
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
 com/example/demo/src/user/UserService.java
  com.example.demo.src.user.UserService
 com/example/demo/src/model/DiaryList.java
@@ -198,13 +182,6 @@ com/example/demo/src/model/SaveBookDto.java
  com.example.demo.src.model.SaveBookDto$SaveBookDtoBuilder
 com/example/demo/src/WebSecurityConfig.java
  com.example.demo.src.WebSecurityConfig
-<<<<<<< HEAD
-com/example/demo/src/diary/DiaryController.java
- com.example.demo.src.diary.DiaryController
-com/example/demo/src/test/TestController.java
- com.example.demo.src.test.TestController
-=======
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
 com/example/demo/src/model/UpdateDiaryListsDto.java
  com.example.demo.src.model.UpdateDiaryListsDto
 com/example/demo/src/my/model/GetMyBook.java
@@ -215,19 +192,10 @@ com/example/demo/src/repository/MoodRepository.java
  com.example.demo.src.repository.MoodRepository
 com/example/demo/src/model/DiaryDto.java
  com.example.demo.src.model.DiaryDto
-<<<<<<< HEAD
-com/example/demo/src/model/DiarySummary.java
- com.example.demo.src.model.DiarySummary
-com/example/demo/src/user/UserController.java
- com.example.demo.src.user.UserController
-com/example/demo/src/home/model/GetHomeLevelRes.java
- com.example.demo.src.home.model.GetHomeLevelRes
-=======
 com/example/demo/src/ready/model/GetReadyRes.java
  com.example.demo.src.ready.model.GetReadyRes
 com/example/demo/src/my/model/MyBook.java
  com.example.demo.src.my.model.MyBook
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
 com/example/demo/src/repository/DiaryImgRepository.java
  com.example.demo.src.repository.DiaryImgRepository
 com/example/demo/src/model/DiaryImg.java
@@ -235,26 +203,11 @@ com/example/demo/src/model/DiaryImg.java
  com.example.demo.src.model.DiaryImg$DiaryImgBuilder
 com/example/demo/src/diary/DiaryProvider.java
  com.example.demo.src.diary.DiaryProvider
-<<<<<<< HEAD
-com/example/demo/src/model/SaveUserDto.java
- com.example.demo.src.model.SaveUserDto
- com.example.demo.src.model.SaveUserDto$SaveUserDtoBuilder
-=======
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
 com/example/demo/DemoApplication.java
  com.example.demo.DemoApplication
 com/example/demo/src/diary/DiaryService.java
  com.example.demo.src.diary.DiaryService
-<<<<<<< HEAD
-com/example/demo/utils/JwtService.java
- com.example.demo.utils.JwtService
-com/example/demo/src/model/Miss.java
- com.example.demo.src.model.Miss
-com/example/demo/src/user/UserProvider.java
- com.example.demo.src.user.UserProvider
-=======
 com/example/demo/src/ready/model/PostReadyAnswerReq.java
  com.example.demo.src.ready.model.PostReadyAnswerReq
 com/example/demo/src/my/model/MyPassword.java
  com.example.demo.src.my.model.MyPassword
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4

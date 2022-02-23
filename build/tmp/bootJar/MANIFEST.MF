@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-Manifest-Version: 1.0
-Main-Class: org.springframework.boot.loader.JarLauncher
-Start-Class: com.example.demo.DemoApplication
-Spring-Boot-Version: 2.4.2
-Spring-Boot-Classes: BOOT-INF/classes/
-Spring-Boot-Lib: BOOT-INF/lib/
-Spring-Boot-Classpath-Index: BOOT-INF/classpath.idx
-Spring-Boot-Layers-Index: BOOT-INF/layers.idx
-
-=======
 Manifest-Version: 1.0
 Spring-Boot-Classpath-Index: BOOT-INF/classpath.idx
 Spring-Boot-Layers-Index: BOOT-INF/layers.idx
@@ -18,4 +7,3 @@ Spring-Boot-Lib: BOOT-INF/lib/
 Spring-Boot-Version: 2.4.2
 Main-Class: org.springframework.boot.loader.JarLauncher
 
->>>>>>> 8124c7c18cda61011754274ba4b5c089648bdaf4
