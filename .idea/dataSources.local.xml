@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="test@forclass.c8ydsrovkrwj.ap-northeast-2.rds.amazonaws.com" uuid="c03aad89-fb79-4133-ac46-eae3a9c78723">
+      <database-info product="MySQL" version="8.0.20" jdbc-version="4.2" driver-name="MySQL Connector/J" driver-version="mysql-connector-java-8.0.21 (Revision: 33f65445a1bcc544eb0120491926484da168f199)" dbms="MYSQL" exact-version="8.0.20" exact-driver-version="8.0">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>khg08071</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema" qname="@" />
+        </introspection-scope>
+      </schema-mapping>
+    </data-source>
+  </component>
+</project>

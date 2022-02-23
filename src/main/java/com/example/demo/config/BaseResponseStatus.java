@@ -63,6 +63,31 @@ public enum BaseResponseStatus {
     NONE_PAGE(false,2047,"해당 페이지는 존재하지 않습니다."),
     ALREADY_PET_EXIST(false,2048,"중복된 반려동물 이름입니다."),
     NONE_PETS_EXIST(false,2049,"존재하지 않는 반려동물입니다."),
+    UNVALID_FILTER(false, 2050, "해당하는 필터가 없습니다."),
+
+    MODIFY_FAIL(false, 2070, "준비하기 답변 수정에 실패했습니다."),
+    EMPTY_BOOK_TITLE(false, 2071, "책 제목을 입력해주세요"),
+    EMPTY_WRITER_NICKNAME(false, 2072, "작가명을 입력해주세요"),
+    OVER_TWELVE_CHAR(false,2073,"12자 이내로 작성해주세요"),
+    FAIL_MODIFY_BOOK(false,2074,"책 표지를 수정하는데 실패했습니다."),
+
+    EMPTY_PET_NAME(false,2075,"반려동물 이름을 입력하세요"),
+    EMPTY_PET_TYPE(false,2076,"반려동물 종을 입력하세요"),
+    EMPTY_PET_FAMILY_DATE(false,2077,"반려동물이 가족이 된 날짜를 입력하세요"),
+    OVER_SIX_CHAR(false,2078,"6자 이내로 작성해주세요"),
+    EMPTY_PET_STATUS(false,2079,"반려동물 상태를 입력하세요"),
+    FAIL_MODIFY_PET_INFO(false,2080,"반려동물 정보를 수정하는데 실패했습니다."),
+    FAIL_DELETE_PET(false,2081,"반려동물 정보를 삭제하는데 실패했습니다."),
+
+    EXIST_ANSWER(false,2081,"해당 질문에 대한 답변이 이미 작성되었습니다."),
+
+    ALREADY_DELETE_ANSWER(false,2082, "이미 삭제된 답변입니다"),
+    IDX_NOT_EXIST(false,2083,"존재하지 않는 idx입니다."),
+    EMPTY_USER_OLD_PASSWORD(false,2084,"비밀번호를 입력하세요"),
+    EMPTY_USER_NEW_PASSWORD(false,2085,"신규 비밀번호를 입력하세요"),
+    REENTER_PASSWORD_IS_DIFFERENT(false,2086,"재확인 비밀번호가 일치하지 않습니다."),
+
+    POST_USERS_INVALID_PASSWORD(false,2087,"비밀번호 형식을 확인해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -80,13 +105,16 @@ public enum BaseResponseStatus {
      * 4000 : Database, Server 오류
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
-    SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
+    DATABASE_EXIST_ERROR(false, 4001, "데이터베이스에 존재하는지 여부 연결에 실패하였습니다."),
+    SERVER_ERROR(false, 4002, "서버와의 연결에 실패하였습니다."),
 
     //[PATCH] /users/{userIdx}
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
+    PASSWORD_ERROR(false, 4013, "비밀번호 인증에 실패하였습니다."),
+    PASSWORD_MODIFY_ERROR(false, 4014, "비밀번호 변경에 실패하였습니다.");
 
 
     // 5000 : 필요시 만들어서 쓰세요

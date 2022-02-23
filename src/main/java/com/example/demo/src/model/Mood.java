@@ -44,5 +44,5 @@ public class Mood {
         this.diary = diary;
         this.name = name;
     }
-    
+
 }

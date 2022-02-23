@@ -1,12 +1,22 @@
 # Mascota 
 
+## :octocat: api 명세
 
-### REST API
-
-
-### Home
-- `src`: 메인 로직
-  `src`에는 도메인 별로 패키지를 구성하도록 했다. **도메인**이란 회원(User), 게시글(Post), 댓글(Comment), 주문(Order) 등 소프트웨어에 대한 요구사항 혹은 문제 영역이라고 생각하면 된다. 각자 설계할 APP을 분석하고 필요한 도메인을 도출하여 `src` 폴더를 구성하자.
-- `config` 및 `util` 폴더: 메인 로직은 아니지만 `src` 에서 필요한 부차적인 파일들을 모아놓은 폴더
-- 도메인 폴더 구조
-> Route - Controller - Provider/Service - DAO
+| Method | URI | Description | 개발 | 서버 |
+| ------ | -- | -- |--------------- |-------------- |
+| GET | /readies/all/:userIdx/:petIdx | [준비하기 전체 질문 조회](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/ready) |☑️|  | 
+| GET | /readies/ones/:userIdx/:readyAnswerIdx | [준비하기 개별 질문 조회](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/ready)  |☑️|  | 
+| POST | /readies/one/:userIdx/:petIdx/:readyQuestionIdx | [준비하기 작성](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/ready)  |☑️|  | 
+| PATCH |/readies/one/:userIdx/:readyAnswerIdx| [준비하기 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/ready) |☑️|  | 
+| GET | /memories/notAnsweredMemories/:userIdx/:petIdx | [추억하기 전체 질문 조회 (답변하기 탭)](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/memory) |☑️|  | 
+| GET | /memories/answeredMemories/:userIdx/:petIdx | [추억하기 전체 질문 조회 (모아보기 탭)](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/memory) |☑️|  | 
+| GET | /memories/:userIdx/:readyAnswerIdx | [추억하기 개별 질문 조회](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/memory) |☑️|  | 
+| PATCH | /memories/one/:userIdx/:memoryAnswerIdx | [추억하기 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/memory) |☑️|  | 
+| POST | /memories/one/:userIdx/:petIdx/:memoryQuestionIdx | [추억하기 작성](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/memory) |☑️|  | 
+| GET | /myPages/:userIdx | [마이페이지 전체 조회](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
+| GET | /myPages/myInfo/:userIdx | [마이페이지 개인정보 조회](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
+| PATCH | /myPages/bookInfo/:userIdx | [책 표지 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
+| PATCH | /myPages/petInfo/:userIdx/:petIdx | [동물 프로필 수정](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
+| PATCH | /myPages/petInfo/:userIdx/:petIdx/status | [동물 프로필 삭제](https://github.com/isoomni/mascota/tree/master/src/main/java/com/example/demo/src/my) |☑️|  | 
+| GET |  | 기록하기 일기 상세 조회 || | 
+| GET |  | 캘린더 조회 | |  | 

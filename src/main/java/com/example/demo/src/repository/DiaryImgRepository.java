@@ -13,5 +13,5 @@ import java.util.Set;
 
 public interface DiaryImgRepository extends JpaRepository<DiaryImg, Integer> {
 
-    
+
 }
